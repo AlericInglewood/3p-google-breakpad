@@ -1,0 +1,250 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B89E0E601166556C00DD08C9 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = B89E0E5F1166556C00DD08C9 /* libcrypto.dylib */; };
+		B8C5B5161166534700D34F4E /* functioninfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = F9C7ED420E8AD93000E953AD /* functioninfo.cc */; };
+		B8C5B5171166534700D34F4E /* dwarf2reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F95B422F0E0E22D100DBDE83 /* dwarf2reader.cc */; };
+		B8C5B5181166534700D34F4E /* bytereader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F95B422C0E0E22D100DBDE83 /* bytereader.cc */; };
+		B8C5B5191166534700D34F4E /* macho_utilities.cc in Sources */ = {isa = PBXBuildFile; fileRef = 557800890BE1F3AB00EC23E0 /* macho_utilities.cc */; };
+		B8C5B51A1166534700D34F4E /* file_id.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9BE650410B52F6D800611104 /* file_id.cc */; };
+		B8C5B51B1166534700D34F4E /* macho_id.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9BE650430B52F6D800611104 /* macho_id.cc */; };
+		B8C5B51C1166534700D34F4E /* macho_walker.cc in Sources */ = {isa = PBXBuildFile; fileRef = 9BE650450B52F6D800611104 /* macho_walker.cc */; };
+		B8C5B51D1166534700D34F4E /* dump_syms.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* dump_syms.mm */; };
+		B8C5B51E1166534700D34F4E /* dump_syms_tool.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BDF186E0B1BB43700F8391B /* dump_syms_tool.mm */; };
+		B8C5B523116653BA00D34F4E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08FB779EFE84155DC02AAC07 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		08FB7796FE84155DC02AAC07 /* dump_syms.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = dump_syms.mm; path = ../../../common/mac/dump_syms.mm; sourceTree = "<group>"; };
+		08FB779EFE84155DC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		557800890BE1F3AB00EC23E0 /* macho_utilities.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = macho_utilities.cc; path = ../../../common/mac/macho_utilities.cc; sourceTree = SOURCE_ROOT; };
+		5578008A0BE1F3AB00EC23E0 /* macho_utilities.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = macho_utilities.h; path = ../../../common/mac/macho_utilities.h; sourceTree = SOURCE_ROOT; };
+		9BDF186D0B1BB43700F8391B /* dump_syms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dump_syms.h; path = ../../../common/mac/dump_syms.h; sourceTree = "<group>"; };
+		9BDF186E0B1BB43700F8391B /* dump_syms_tool.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = dump_syms_tool.mm; sourceTree = "<group>"; };
+		9BE650410B52F6D800611104 /* file_id.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = file_id.cc; path = ../../../common/mac/file_id.cc; sourceTree = SOURCE_ROOT; };
+		9BE650420B52F6D800611104 /* file_id.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = file_id.h; path = ../../../common/mac/file_id.h; sourceTree = SOURCE_ROOT; };
+		9BE650430B52F6D800611104 /* macho_id.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = macho_id.cc; path = ../../../common/mac/macho_id.cc; sourceTree = SOURCE_ROOT; };
+		9BE650440B52F6D800611104 /* macho_id.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = macho_id.h; path = ../../../common/mac/macho_id.h; sourceTree = SOURCE_ROOT; };
+		9BE650450B52F6D800611104 /* macho_walker.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = macho_walker.cc; path = ../../../common/mac/macho_walker.cc; sourceTree = SOURCE_ROOT; };
+		9BE650460B52F6D800611104 /* macho_walker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = macho_walker.h; path = ../../../common/mac/macho_walker.h; sourceTree = SOURCE_ROOT; };
+		B89E0E5F1166556C00DD08C9 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
+		B8C5B5111166531A00D34F4E /* dump_syms */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dump_syms; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8E8CA0C1156C854009E61B2 /* byteswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = byteswap.h; path = ../../../common/mac/byteswap.h; sourceTree = SOURCE_ROOT; };
+		F95B422B0E0E22D100DBDE83 /* bytereader-inl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "bytereader-inl.h"; path = "../../../common/dwarf/bytereader-inl.h"; sourceTree = SOURCE_ROOT; };
+		F95B422C0E0E22D100DBDE83 /* bytereader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bytereader.cc; path = ../../../common/dwarf/bytereader.cc; sourceTree = SOURCE_ROOT; };
+		F95B422D0E0E22D100DBDE83 /* bytereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bytereader.h; path = ../../../common/dwarf/bytereader.h; sourceTree = SOURCE_ROOT; };
+		F95B422E0E0E22D100DBDE83 /* dwarf2enums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dwarf2enums.h; path = ../../../common/dwarf/dwarf2enums.h; sourceTree = SOURCE_ROOT; };
+		F95B422F0E0E22D100DBDE83 /* dwarf2reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dwarf2reader.cc; path = ../../../common/dwarf/dwarf2reader.cc; sourceTree = SOURCE_ROOT; };
+		F95B42300E0E22D100DBDE83 /* dwarf2reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dwarf2reader.h; path = ../../../common/dwarf/dwarf2reader.h; sourceTree = SOURCE_ROOT; };
+		F95B42310E0E22D100DBDE83 /* line_state_machine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = line_state_machine.h; path = ../../../common/dwarf/line_state_machine.h; sourceTree = SOURCE_ROOT; };
+		F9C7ED420E8AD93000E953AD /* functioninfo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = functioninfo.cc; path = ../../../common/dwarf/functioninfo.cc; sourceTree = SOURCE_ROOT; };
+		F9F5344D0E7C902C0012363F /* functioninfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functioninfo.h; path = ../../../common/dwarf/functioninfo.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B8C5B50F1166531A00D34F4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8C5B523116653BA00D34F4E /* Foundation.framework in Frameworks */,
+				B89E0E601166556C00DD08C9 /* libcrypto.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* dump_syms */ = {
+			isa = PBXGroup;
+			children = (
+				F9F5344B0E7C8FFC0012363F /* DWARF */,
+				B8E8CA0C1156C854009E61B2 /* byteswap.h */,
+				557800890BE1F3AB00EC23E0 /* macho_utilities.cc */,
+				5578008A0BE1F3AB00EC23E0 /* macho_utilities.h */,
+				9BE650410B52F6D800611104 /* file_id.cc */,
+				9BE650420B52F6D800611104 /* file_id.h */,
+				9BE650430B52F6D800611104 /* macho_id.cc */,
+				9BE650440B52F6D800611104 /* macho_id.h */,
+				9BE650450B52F6D800611104 /* macho_walker.cc */,
+				9BE650460B52F6D800611104 /* macho_walker.h */,
+				9BDF186D0B1BB43700F8391B /* dump_syms.h */,
+				08FB7796FE84155DC02AAC07 /* dump_syms.mm */,
+				9BDF186E0B1BB43700F8391B /* dump_syms_tool.mm */,
+				08FB779DFE84155DC02AAC07 /* External Frameworks and Libraries */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = dump_syms;
+			sourceTree = "<group>";
+		};
+		08FB779DFE84155DC02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				08FB779EFE84155DC02AAC07 /* Foundation.framework */,
+				B89E0E5F1166556C00DD08C9 /* libcrypto.dylib */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B8C5B5111166531A00D34F4E /* dump_syms */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F9F5344B0E7C8FFC0012363F /* DWARF */ = {
+			isa = PBXGroup;
+			children = (
+				F9C7ED420E8AD93000E953AD /* functioninfo.cc */,
+				F9F5344D0E7C902C0012363F /* functioninfo.h */,
+				F95B422E0E0E22D100DBDE83 /* dwarf2enums.h */,
+				F95B422F0E0E22D100DBDE83 /* dwarf2reader.cc */,
+				F95B42300E0E22D100DBDE83 /* dwarf2reader.h */,
+				F95B422D0E0E22D100DBDE83 /* bytereader.h */,
+				F95B422B0E0E22D100DBDE83 /* bytereader-inl.h */,
+				F95B422C0E0E22D100DBDE83 /* bytereader.cc */,
+				F95B42310E0E22D100DBDE83 /* line_state_machine.h */,
+			);
+			name = DWARF;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B8C5B5101166531A00D34F4E /* dump_syms */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8C5B5151166533900D34F4E /* Build configuration list for PBXNativeTarget "dump_syms" */;
+			buildPhases = (
+				B8C5B50E1166531A00D34F4E /* Sources */,
+				B8C5B50F1166531A00D34F4E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dump_syms;
+			productName = dump_syms;
+			productReference = B8C5B5111166531A00D34F4E /* dump_syms */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB927808733DD40010E9CD /* Build configuration list for PBXProject "dump_syms" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* dump_syms */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B8C5B5101166531A00D34F4E /* dump_syms */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B8C5B50E1166531A00D34F4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8C5B5161166534700D34F4E /* functioninfo.cc in Sources */,
+				B8C5B5171166534700D34F4E /* dwarf2reader.cc in Sources */,
+				B8C5B5181166534700D34F4E /* bytereader.cc in Sources */,
+				B8C5B5191166534700D34F4E /* macho_utilities.cc in Sources */,
+				B8C5B51A1166534700D34F4E /* file_id.cc in Sources */,
+				B8C5B51B1166534700D34F4E /* macho_id.cc in Sources */,
+				B8C5B51C1166534700D34F4E /* macho_walker.cc in Sources */,
+				B8C5B51D1166534700D34F4E /* dump_syms.mm in Sources */,
+				B8C5B51E1166534700D34F4E /* dump_syms_tool.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB927908733DD40010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "../../../**";
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		1DEB927A08733DD40010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+		B8C5B5131166531B00D34F4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = dump_syms;
+			};
+			name = Debug;
+		};
+		B8C5B5141166531B00D34F4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = dump_syms;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB927808733DD40010E9CD /* Build configuration list for PBXProject "dump_syms" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB927908733DD40010E9CD /* Debug */,
+				1DEB927A08733DD40010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B8C5B5151166533900D34F4E /* Build configuration list for PBXNativeTarget "dump_syms" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8C5B5131166531B00D34F4E /* Debug */,
+				B8C5B5141166531B00D34F4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
