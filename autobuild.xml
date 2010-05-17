@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<llsd>
+<map>
+    <key>google_breakpad</key>
+    <map>
+      <key>build</key>
+      <map>
+        <key>darwin</key>
+        <map>
+          <key>command</key>
+          <string>./build-cmd.sh</string>
+        </map>
+      </map>
+      <key>builddir</key>
+      <string>./stage</string>
+      <key>license</key>
+      <string>bsd</string>
+      <key>licensefile</key>
+      <string>LICENSES/google_breakpad.txt</string>
+      <key>manifest</key>
+      <map>
+        <key>darwin</key>
+        <map>
+          <key>files</key>
+          <array>
+            <string>libraries/include/*.h</string>
+            <string>libraries/universal-darwin/lib_release/*.dylib</string>
+            <string>LICENSES/google_breakpad.txt</string>
+          </array>
+        </map>
+      </map>
+      <key>sourcedir</key>
+      <string>stage</string>
+      <key>version</key>
+      <string>0.0.0-rev599</string>
+      <key>uploadtos3</key>
+      <integer>1</integer>
+    </map>
+  </map>
+</llsd>

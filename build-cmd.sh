@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# turn on verbose debugging output for parabuild logs.
+set -x
+# make errors fatal
+set -e
+
+if [ -z "$AUTOBUILD" ] ; then 
+    fail
+fi
+
+if [ "$OSTYPE" = "cygwin" ] ; then
+    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+fi
+
+# load autbuild provided shell functions and variables
+set +x
+eval "$("$AUTOBUILD" source_environment)"
+set -x
+
+case "$AUTOBUILD_PLATFORM" in
+    "windows")
+        echo "TODO: implement for windows!"
+        fail
+    ;;
+    darwin)
+        xcodebuild -project src/client/mac/Breakpad.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4
+        mkdir -p stage/libraries/universal-darwin/lib_release
+        mkdir -p stage/libraries/include
+        cp ./src/client/mac/build/Release/Breakpad.framework/Headers/Breakpad.h ./stage/libraries/include
+        cp ./src/client/mac/build/Release/Breakpad.framework/Resources/breakpadUtilities.dylib ./stage/libraries/universal-darwin/lib_release
+    ;;
+    linux)
+        ./configure --prefix="$(pwd)/stage"
+        make
+        make install
+    ;;
+esac
+mkdir -p stage/LICENSES
+cp COPYING stage/LICENSES/google_breakpad.txt
+
+pass
+
