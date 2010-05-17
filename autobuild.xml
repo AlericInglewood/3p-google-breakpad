@@ -10,13 +10,18 @@
           <key>command</key>
           <string>./build-cmd.sh</string>
         </map>
+        <key>windows</key>
+        <map>
+          <key>command</key>
+          <string>sh build-cmd.sh</string>
+        </map>
       </map>
       <key>builddir</key>
-      <string>./stage</string>
+      <string>stage</string>
       <key>license</key>
       <string>bsd</string>
       <key>licensefile</key>
-      <string>LICENSES/google_breakpad.txt</string>
+      <string>LICENSES\google_breakpad.txt</string>
       <key>manifest</key>
       <map>
         <key>darwin</key>
@@ -28,13 +33,23 @@
             <string>LICENSES/google_breakpad.txt</string>
           </array>
         </map>
+        <key>windows</key>
+        <map>
+          <key>files</key>
+          <array>
+            <string>libraries\include\*.h</string>
+            <string>libraries\i686-win32\lib\release\*.lib</string>
+            <string>libraries\i686-win32\lib\debug\*.lib</string>
+            <string>LICENSES\google_breakpad.txt</string>
+          </array>
+        </map>
       </map>
       <key>sourcedir</key>
       <string>stage</string>
-      <key>version</key>
-      <string>0.0.0-rev599</string>
       <key>uploadtos3</key>
       <integer>1</integer>
+      <key>version</key>
+      <string>0.0.0-rev599</string>
     </map>
   </map>
 </llsd>

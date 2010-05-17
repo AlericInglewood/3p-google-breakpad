@@ -20,8 +20,18 @@ set -x
 
 case "$AUTOBUILD_PLATFORM" in
     "windows")
-        echo "TODO: implement for windows!"
-        fail
+        (
+            cd src/client/windows
+            ../../tools/gyp/gyp --msvs-version=2005
+        )
+        build_sln src/client/windows/breakpad_client.sln "release|win32" exception_handler
+        build_sln src/client/windows/breakpad_client.sln "debug|win32" exception_handler
+        mkdir -p stage/libraries/i686-win32/lib/debug
+        mkdir -p stage/libraries/i686-win32/lib/release
+        mkdir -p stage/libraries/include
+        cp ./src/client/windows/handler/exception_handler.h ./stage/libraries/include
+        cp ./src/client/windows/Debug/lib/exception_handler.lib ./stage/libraries/i686-win32/lib/debug
+        cp ./src/client/windows/Release/lib/exception_handler.lib ./stage/libraries/i686-win32/lib/release
     ;;
     darwin)
         xcodebuild -project src/client/mac/Breakpad.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4
