@@ -37,10 +37,10 @@
         <map>
           <key>files</key>
           <array>
-            <string>libraries\include\*.h</string>
-            <string>libraries\i686-win32\lib\release\*.lib</string>
-            <string>libraries\i686-win32\lib\debug\*.lib</string>
-            <string>LICENSES\google_breakpad.txt</string>
+            <string>libraries/include/*.h</string>
+            <string>libraries/i686-win32/lib/release/*.lib</string>
+            <string>libraries/i686-win32/lib/debug/*.lib</string>
+            <string>LICENSES/google_breakpad.txt</string>
           </array>
         </map>
       </map>
