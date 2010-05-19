@@ -48,6 +48,15 @@ case "$AUTOBUILD_PLATFORM" in
         ./configure --prefix="$(pwd)/stage"
         make
         make install
+        INCDIR=stage/libraries/include
+        LIBDIR=stage/libraries/i686-linux/lib_release
+        mkdir -p $LIBDIR
+        mkdir -p $INCDIR/client/linux/{handler,crash_generation}
+        mkdir -p $INCDIR/processor
+        cp -P stage/lib/libbreakpad*.so* $LIBDIR
+        cp src/client/linux/handler/*h $INCDIR/client/linux/handler
+        cp src/client/linux/crash_generation/*h $INCDIR/client/linux/crash_generation
+        cp src/processor/scoped_ptr.*h $INCDIR/processor
     ;;
 esac
 mkdir -p stage/LICENSES
