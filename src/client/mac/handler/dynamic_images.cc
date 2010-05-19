@@ -37,6 +37,7 @@ extern "C" { // needed to compile on Leopard
 #include <dlfcn.h>
 #include <mach/mach_vm.h>
 #include <algorithm>
+#include <cassert>
 #include "client/mac/handler/dynamic_images.h"
 
 namespace google_breakpad {

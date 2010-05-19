@@ -34,11 +34,15 @@ case "$AUTOBUILD_PLATFORM" in
         cp ./src/client/windows/Release/lib/exception_handler.lib ./stage/libraries/i686-win32/lib/release
     ;;
     darwin)
-        xcodebuild -project src/client/mac/Breakpad.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4
+        (
+            cd src/
+            cmake CMakeLists.txt
+            make
+        )
         mkdir -p stage/libraries/universal-darwin/lib_release
         mkdir -p stage/libraries/include
-        cp ./src/client/mac/build/Release/Breakpad.framework/Headers/Breakpad.h ./stage/libraries/include
-        cp ./src/client/mac/build/Release/Breakpad.framework/Resources/breakpadUtilities.dylib ./stage/libraries/universal-darwin/lib_release
+        cp ./src/client/mac/handler/exception_handler.h ./stage/libraries/include
+        cp ./src/client/mac/handler/libexception_handler.dylib ./stage/libraries/universal-darwin/lib_release
     ;;
     linux)
         ./configure --prefix="$(pwd)/stage"

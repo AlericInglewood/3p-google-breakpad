@@ -26,7 +26,7 @@
       <key>license</key>
       <string>bsd</string>
       <key>licensefile</key>
-      <string>LICENSES\google_breakpad.txt</string>
+      <string>LICENSES/google_breakpad.txt</string>
       <key>manifest</key>
       <map>
         <key>darwin</key>
