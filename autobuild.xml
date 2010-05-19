@@ -10,6 +10,11 @@
           <key>command</key>
           <string>./build-cmd.sh</string>
         </map>
+        <key>linux</key>
+        <map>
+          <key>command</key>
+          <string>./build-cmd.sh</string>
+        </map>
         <key>windows</key>
         <map>
           <key>command</key>
