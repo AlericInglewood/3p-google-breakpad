@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<llsd>
+<map>
+    <key>google_breakpad_server</key>
+    <map>
+      <key>build</key>
+      <map>
+        <key>linux</key>
+        <map>
+          <key>command</key>
+          <string>./build-cmd.sh</string>
+        </map>
+      </map>
+      <key>builddir</key>
+      <string>stage</string>
+      <key>license</key>
+      <string>bsd</string>
+      <key>licensefile</key>
+      <string>LICENSES/google_breakpad.txt</string>
+      <key>manifest</key>
+      <map>
+        <key>linux</key>
+        <map>
+          <key>files</key>
+          <array>
+            <string>bin/minidump*</string>
+            <string>LICENSES/google_breakpad.txt</string>
+          </array>
+        </map>
+      </map>
+      <key>sourcedir</key>
+      <string>stage</string>
+      <key>uploadtos3</key>
+      <integer>1</integer>
+      <key>version</key>
+      <string>0.0.0-rev599</string>
+    </map>
+  </map>
+</llsd>
