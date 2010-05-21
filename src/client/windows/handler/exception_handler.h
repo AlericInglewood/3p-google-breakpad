@@ -57,7 +57,7 @@
 #define CLIENT_WINDOWS_HANDLER_EXCEPTION_HANDLER_H__
 
 #include <stdlib.h>
-#include <winsock.h>
+#include <winsock2.h>
 #include <Windows.h>
 #include <DbgHelp.h>
 #include <rpc.h>
