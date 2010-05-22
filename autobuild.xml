@@ -42,9 +42,9 @@
         <map>
           <key>files</key>
           <array>
-            <string>libraries/i686-linux/lib_release/*</string>
+            <string>libraries/i686-linux/lib_release_client/*</string>
             <string>libraries/include/google_breakpad/processor/*</string>
-            <string>libraries/include/google_breakpad/client/linux/handler/*</string>
+            <string>libraries/include/google_breakpad/*.h</string>
             <string>libraries/include/google_breakpad/client/linux/crash_generation/*</string>
             <string>libraries/i686-linux/bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>

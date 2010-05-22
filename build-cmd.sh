@@ -69,15 +69,15 @@ case "$AUTOBUILD_PLATFORM" in
         make -C src/tools/linux/dump_syms/ dump_syms
         make install
         INCDIR=stage/libraries/include/google_breakpad
-        LIBDIR=stage/libraries/i686-linux/lib_release
+        LIBDIR=stage/libraries/i686-linux/lib_release_client
         BINDIR=stage/libraries/i686-linux/bin
         mkdir -p $LIBDIR
         mkdir -p $INCDIR/client/linux/{handler,crash_generation}
         mkdir -p $INCDIR/processor
         mkdir -p $BINDIR
         cp -P stage/lib/libbreakpad*.so* $LIBDIR
-        cp src/client/linux/handler/*h $INCDIR/client/linux/handler
-        cp src/client/linux/crash_generation/*h $INCDIR/client/linux/crash_generation
+        cp src/client/linux/handler/*.h $INCDIR
+        cp src/client/linux/crash_generation/*.h $INCDIR/client/linux/crash_generation
         cp src/processor/scoped_ptr.*h $INCDIR/processor
         cp src/tools/linux/dump_syms/dump_syms "$BINDIR"
     ;;
