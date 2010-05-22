@@ -33,7 +33,7 @@
         <map>
           <key>files</key>
           <array>
-            <string>libraries/include/*.h</string>
+            <string>libraries/include/google_breakpad/*.h</string>
             <string>libraries/universal-darwin/lib_release/*.dylib</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
@@ -43,9 +43,10 @@
           <key>files</key>
           <array>
             <string>libraries/i686-linux/lib_release/*</string>
-            <string>libraries/include/processor/*</string>
-            <string>libraries/include/client/linux/handler/*</string>
-            <string>libraries/include/client/linux/crash_generation/*</string>
+            <string>libraries/include/google_breakpad/processor/*</string>
+            <string>libraries/include/google_breakpad/client/linux/handler/*</string>
+            <string>libraries/include/google_breakpad/client/linux/crash_generation/*</string>
+            <string>libraries/i686-linux/bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
         </map>
@@ -53,9 +54,15 @@
         <map>
           <key>files</key>
           <array>
-            <string>libraries/include/*.h</string>
+            <string>libraries/include/google_breakpad/*.h</string>
+            <string>libraries/include/google_breakpad/client/windows/common/*.h</string>
+            <string>libraries/include/google_breakpad/client/windows/crash_generation/*.h</string>
+            <string>libraries/include/google_breakpad/common/windows/*.h</string>
+            <string>libraries/include/google_breakpad/google_breakpad/common/*.h</string>
+            <string>libraries/include/google_breakpad/processor/*.h</string>
             <string>libraries/i686-win32/lib/release/*.lib</string>
             <string>libraries/i686-win32/lib/debug/*.lib</string>
+            <string>libraries/i686-win32/bin/dump_syms.exe</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
         </map>
