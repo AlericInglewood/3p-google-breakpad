@@ -1200,6 +1200,7 @@
             'WarningLevel': '3',
             'WarnAsError': 'true',
             'DebugInformationFormat': '3',
+            'TreatWChar_tAsBuiltInType': 'false',
             'conditions': [
               [ 'msvs_multi_core_compile', {
                 'AdditionalOptions': ['/MP'],
