@@ -38,6 +38,11 @@ list(APPEND exception_handler_SOURCE_FILES ${exception_handler_HEADER_FILES})
 
 add_library (exception_handler SHARED ${exception_handler_SOURCE_FILES})
 
+set_target_properties(exception_handler PROPERTIES
+    BUILD_WITH_INSTALL_RPATH 1
+    INSTALL_NAME_DIR "@executable_path/../Resources"
+    )
+
 target_link_libraries(
     exception_handler
     crypto
