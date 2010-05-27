@@ -56,11 +56,14 @@ case "$AUTOBUILD_PLATFORM" in
             cmake CMakeLists.txt -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
             make
         )
-        #xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4
+		# *TODO - fix the release build of the dump_syms tool
+        xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4 -configuration Debug
         mkdir -p stage/libraries/universal-darwin/lib_release
+        mkdir -p stage/libraries/universal-darwin/bin
         mkdir -p stage/libraries/include/google_breakpad
         cp ./src/client/mac/handler/exception_handler.h ./stage/libraries/include/google_breakpad
         cp ./src/client/mac/handler/libexception_handler.dylib ./stage/libraries/universal-darwin/lib_release
+        cp ./src/tools/mac/dump_syms/build/Debug/dump_syms ./stage/libraries/universal-darwin/bin
     ;;
     linux)
         VIEWER_FLAGS="-m32 -fno-stack-protector"

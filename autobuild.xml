@@ -35,6 +35,7 @@
           <array>
             <string>libraries/include/google_breakpad/*.h</string>
             <string>libraries/universal-darwin/lib_release/*.dylib</string>
+            <string>libraries/universal-darwin/bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
         </map>
