@@ -53,8 +53,8 @@ case "$AUTOBUILD_PLATFORM" in
     darwin)
         (
             cd src/
-            cmake CMakeLists.txt -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
-            make
+            cmake -G Xcode CMakeLists.txt
+            xcodebuild -project google_breakpad.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4 -configuration Release
         )
 		# *TODO - fix the release build of the dump_syms tool
         xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4 -configuration Debug
@@ -62,7 +62,7 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p stage/libraries/universal-darwin/bin
         mkdir -p stage/libraries/include/google_breakpad
         cp ./src/client/mac/handler/exception_handler.h ./stage/libraries/include/google_breakpad
-        cp ./src/client/mac/handler/libexception_handler.dylib ./stage/libraries/universal-darwin/lib_release
+        cp ./src/client/mac/handler/Release/libexception_handler.dylib ./stage/libraries/universal-darwin/lib_release
         cp ./src/tools/mac/dump_syms/build/Debug/dump_syms ./stage/libraries/universal-darwin/bin
     ;;
     linux)
