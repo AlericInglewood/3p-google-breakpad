@@ -576,7 +576,7 @@ StackFrame *StackwalkerX86::GetCallerFrame(const CallStack *stack) {
 bool StackwalkerX86::ScanForReturnAddress(u_int32_t location_start,
                                           u_int32_t *location_found,
                                           u_int32_t *eip_found) {
-  const int kRASearchWords = 15;
+  const int kRASearchWords = 255;
   for (u_int32_t location = location_start;
        location <= location_start + kRASearchWords * 4;
        location += 4) {
