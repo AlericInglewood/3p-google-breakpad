@@ -1,79 +1,124 @@
 <?xml version="1.0" ?>
 <llsd>
 <map>
-    <key>google_breakpad</key>
+    <key>package_description</key>
     <map>
-      <key>build</key>
-      <map>
-        <key>darwin</key>
-        <map>
-          <key>command</key>
-          <string>./build-cmd.sh</string>
-        </map>
-        <key>linux</key>
-        <map>
-          <key>command</key>
-          <string>./build-cmd.sh</string>
-        </map>
-        <key>windows</key>
-        <map>
-          <key>command</key>
-          <string>sh build-cmd.sh</string>
-        </map>
-      </map>
-      <key>builddir</key>
-      <string>stage</string>
       <key>license</key>
       <string>bsd</string>
-      <key>licensefile</key>
+      <key>license_file</key>
       <string>LICENSES/google_breakpad.txt</string>
-      <key>manifest</key>
+      <key>name</key>
+      <string>google_breakpad</string>
+      <key>platforms</key>
       <map>
         <key>darwin</key>
         <map>
-          <key>files</key>
+          <key>build_directory</key>
+          <string>stage</string>
+          <key>configurations</key>
+          <map>
+            <key>RelWithDebInfo</key>
+            <map>
+              <key>build</key>
+              <map>
+                <key>command</key>
+                <string>../build-cmd.sh</string>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>RelWithDebInfo</string>
+            </map>
+          </map>
+          <key>manifest</key>
           <array>
-            <string>libraries/include/google_breakpad/*.h</string>
-            <string>libraries/universal-darwin/lib_release/*.dylib</string>
-            <string>libraries/universal-darwin/bin/dump_syms</string>
+            <string>include/google_breakpad/*.h</string>
+            <string>lib/release/*.dylib</string>
+            <string>bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
+          <key>name</key>
+          <string>darwin</string>
         </map>
         <key>linux</key>
         <map>
-          <key>files</key>
+          <key>build_directory</key>
+          <string>stage</string>
+          <key>configurations</key>
+          <map>
+            <key>RelWithDebInfo</key>
+            <map>
+              <key>build</key>
+              <map>
+                <key>command</key>
+                <string>../build-cmd.sh</string>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>RelWithDebInfo</string>
+            </map>
+          </map>
+          <key>manifest</key>
           <array>
-            <string>libraries/i686-linux/lib_release_client/*</string>
-            <string>libraries/include/google_breakpad/processor/*</string>
-            <string>libraries/include/google_breakpad/*.h</string>
-            <string>libraries/include/google_breakpad/client/linux/crash_generation/*</string>
-            <string>libraries/i686-linux/bin/dump_syms</string>
+            <string>lib/release/*</string>
+            <string>include/google_breakpad/processor/*</string>
+            <string>include/google_breakpad/*.h</string>
+            <string>include/google_breakpad/client/linux/crash_generation/*</string>
+            <string>bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
+          <key>name</key>
+          <string>linux</string>
         </map>
         <key>windows</key>
         <map>
-          <key>files</key>
+          <key>build_directory</key>
+          <string>stage</string>
+          <key>configurations</key>
+          <map>
+            <key>RelWithDebInfo</key>
+            <map>
+              <key>build</key>
+              <map>
+                <key>arguments</key>
+                <array>
+                  <string>../build-cmd.sh</string>
+                </array>
+                <key>command</key>
+                <string>sh</string>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>RelWithDebInfo</string>
+            </map>
+          </map>
+          <key>manifest</key>
           <array>
-            <string>libraries/include/google_breakpad/*.h</string>
-            <string>libraries/include/google_breakpad/client/windows/common/*.h</string>
-            <string>libraries/include/google_breakpad/client/windows/crash_generation/*.h</string>
-            <string>libraries/include/google_breakpad/common/windows/*.h</string>
-            <string>libraries/include/google_breakpad/google_breakpad/common/*.h</string>
-            <string>libraries/include/google_breakpad/processor/*.h</string>
-            <string>libraries/i686-win32/lib/release/*.lib</string>
-            <string>libraries/i686-win32/lib/debug/*.lib</string>
-            <string>libraries/i686-win32/bin/dump_syms.exe</string>
+            <string>include/google_breakpad/*.h</string>
+            <string>include/google_breakpad/client/windows/common/*.h</string>
+            <string>include/google_breakpad/client/windows/crash_generation/*.h</string>
+            <string>include/google_breakpad/common/windows/*.h</string>
+            <string>include/google_breakpad/google_breakpad/common/*.h</string>
+            <string>include/google_breakpad/processor/*.h</string>
+            <string>lib/release/*.lib</string>
+            <string>lib/debug/*.lib</string>
+            <string>bin/dump_syms.exe</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
+          <key>name</key>
+          <string>windows</string>
         </map>
       </map>
-      <key>sourcedir</key>
+      <key>source_directory</key>
       <string>stage</string>
-      <key>uploadtos3</key>
-      <integer>1</integer>
       <key>version</key>
       <string>0.0.0-rev599</string>
     </map>
+    <key>type</key>
+    <string>autobuild</string>
+    <key>version</key>
+    <string>1.2</string>
   </map>
 </llsd>
