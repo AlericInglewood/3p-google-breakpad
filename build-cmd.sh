@@ -70,7 +70,7 @@ case "$AUTOBUILD_PLATFORM" in
     ;;
     linux)
         VIEWER_FLAGS="-m32 -fno-stack-protector"
-        ./configure --prefix="$(pwd)/stage" CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAGS=-m32
+        ./configure --prefix="$(pwd)/stage" CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAGS=-m32 CXX=g++-4.1
         make
         make -C src/tools/linux/dump_syms/ dump_syms
         make install
