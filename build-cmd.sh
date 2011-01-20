@@ -72,7 +72,7 @@ case "$AUTOBUILD_PLATFORM" in
         VIEWER_FLAGS="-m32 -fno-stack-protector"
         ./configure --prefix="$(pwd)/stage" CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAGS=-m32 CXX=g++-4.1
         make
-        make -C src/tools/linux/dump_syms/ dump_syms
+        make -C src/tools/linux/dump_syms/ dump_syms CXX=g++-4.1
         make install
         mkdir -p "$INCLUDE_DIRECTORY/client/linux/"{handler,crash_generation}
         cp -P stage/lib/libbreakpad*.so* "$LIBRARY_DIRECTORY_RELEASE"
