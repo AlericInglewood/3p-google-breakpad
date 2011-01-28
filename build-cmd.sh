@@ -33,15 +33,21 @@ case "$AUTOBUILD_PLATFORM" in
     "windows")
         (
             cd src/client/windows
-            ../../tools/gyp/gyp --msvs-version=2005
+            ../../tools/gyp/gyp -G msvs-version=2005
         )
-        build_sln src/client/windows/breakpad_client.sln "release|win32" exception_handler
-        build_sln src/client/windows/breakpad_client.sln "debug|win32" exception_handler
-        build_sln src/client/windows/breakpad_client.sln "release|win32" crash_generation_client
-        build_sln src/client/windows/breakpad_client.sln "debug|win32" crash_generation_client
+
+	devenv.com src/client/windows/breakpad_client.sln /Upgrade
+        build_sln src/client/windows/breakpad_client.sln "release|win32" "(handler)\\exception_handler"
+        build_sln src/client/windows/breakpad_client.sln "debug|win32" "(handler)\\exception_handler"
+        build_sln src/client/windows/breakpad_client.sln "release|win32" "(crash_generation)\\crash_generation_client"
+        build_sln src/client/windows/breakpad_client.sln "debug|win32" "(crash_generation)\\crash_generation_client"
         build_sln src/client/windows/breakpad_client.sln "release|win32" common
         build_sln src/client/windows/breakpad_client.sln "debug|win32" common
-        build_vcproj src/tools/windows/dump_syms/dump_syms.vcproj "release|win32"
+
+	devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
+	
+        #using devenv directly - buildconsole doesn't support building vs2010 vcxproj files directly, yet
+        devenv.com src/tools/windows/dump_syms/dump_syms.vcxproj /build "release|win32" 
         mkdir -p "$INCLUDE_DIRECTORY/client/windows/"{common,crash_generation}
         mkdir -p "$INCLUDE_DIRECTORY/common/windows"
         mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
