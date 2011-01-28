@@ -13,7 +13,7 @@ fi
 
 # load autbuild provided shell functions and variables
 set +x
-eval "$("$AUTOBUILD" source_environment)"
+eval "$(python "$AUTOBUILD" source_environment)"
 set -x
 
 LIBRARY_DIRECTORY_DEBUG=./stage/lib/debug
