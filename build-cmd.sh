@@ -11,9 +11,14 @@ if [ -z "$AUTOBUILD" ] ; then
     fail
 fi
 
-# load autbuild provided shell functions and variables
+# load autobuild provided shell functions and variables
+# first remap the autobuild env to fix the path for sickwin
+if [ "$OSTYPE" = "cygwin" ] ; then
+    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+fi
+
 set +x
-eval "$(python "$AUTOBUILD" source_environment)"
+eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 LIBRARY_DIRECTORY_DEBUG=./stage/lib/debug
