@@ -38,12 +38,12 @@ case "$AUTOBUILD_PLATFORM" in
         )
 
 	devenv.com src/client/windows/breakpad_client.sln /Upgrade
-        build_sln src/client/windows/breakpad_client.sln "release|win32" "(handler)\\exception_handler"
-        build_sln src/client/windows/breakpad_client.sln "debug|win32" "(handler)\\exception_handler"
-        build_sln src/client/windows/breakpad_client.sln "release|win32" "(crash_generation)\\crash_generation_client"
-        build_sln src/client/windows/breakpad_client.sln "debug|win32" "(crash_generation)\\crash_generation_client"
-        build_sln src/client/windows/breakpad_client.sln "release|win32" common
-        build_sln src/client/windows/breakpad_client.sln "debug|win32" common
+        devenv.com src/client/windows/breakpad_client.sln /build "release" /project exception_handler
+        devenv.com src/client/windows/breakpad_client.sln /build "debug" /project exception_handler
+        devenv.com src/client/windows/breakpad_client.sln /build "release" /project crash_generation_client
+        devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project crash_generation_client
+        devenv.com src/client/windows/breakpad_client.sln /build "release"  /project common
+        devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project common
 
 	devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
 	
