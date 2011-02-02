@@ -88,6 +88,11 @@
                 <key>command</key>
                 <string>sh</string>
               </map>
+              <key>configure</key>
+              <map>
+                <key>command</key>
+                <string>""%VS100COMNTOOLS%vsvars32.bat""</string>
+              </map>
               <key>default</key>
               <boolean>true</boolean>
               <key>name</key>
