@@ -1,0 +1,6 @@
+# Use Public Upload Locations
+public_build = true
+
+# Set the VS to build with
+AUTOBUILD_VSVER=100
+
