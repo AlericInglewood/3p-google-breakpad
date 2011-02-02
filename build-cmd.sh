@@ -36,6 +36,8 @@ case "$AUTOBUILD_PLATFORM" in
             cd src/client/windows
             ../../tools/gyp/gyp -G msvs-version=2005
         )
+        
+        load_vsvars()
 
 	devenv.com src/client/windows/breakpad_client.sln /Upgrade
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project exception_handler
