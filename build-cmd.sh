@@ -37,9 +37,9 @@ case "$AUTOBUILD_PLATFORM" in
             ../../tools/gyp/gyp -G msvs-version=2005
         )
         
-        load_vsvars()
-
-	devenv.com src/client/windows/breakpad_client.sln /Upgrade
+        load_vsvars
+        
+        devenv.com src/client/windows/breakpad_client.sln /Upgrade
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project exception_handler
         devenv.com src/client/windows/breakpad_client.sln /build "debug" /project exception_handler
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project crash_generation_client
@@ -47,7 +47,7 @@ case "$AUTOBUILD_PLATFORM" in
         devenv.com src/client/windows/breakpad_client.sln /build "release"  /project common
         devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project common
 
-	devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
+        devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
 	
         #using devenv directly - buildconsole doesn't support building vs2010 vcxproj files directly, yet
         devenv.com src/tools/windows/dump_syms/dump_syms.vcxproj /build "release|win32" 
