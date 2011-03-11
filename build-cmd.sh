@@ -87,6 +87,7 @@ case "$AUTOBUILD_PLATFORM" in
         cp -P stage/lib/libbreakpad*.so* "$LIBRARY_DIRECTORY_RELEASE"
         cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
         cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation"
+        mkdir -p "$INCLUDE_DIRECTORY/processor"
         cp src/processor/scoped_ptr.*h "$INCLUDE_DIRECTORY/processor"
         cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
     ;;
