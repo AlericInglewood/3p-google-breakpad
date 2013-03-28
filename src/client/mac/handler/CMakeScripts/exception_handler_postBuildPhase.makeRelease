@@ -7,4 +7,4 @@ all: \
 
 exception_handler_buildpart_0: 
 	echo "Depend check for xcode"
-	cd /Users/g/LL/3p-google-breakpad-graham/src && make -C /Users/g/LL/3p-google-breakpad-graham/src -f /Users/g/LL/3p-google-breakpad-graham/src/CMakeScripts/XCODE_DEPEND_HELPER.make PostBuild.exception_handler.$(CONFIGURATION)
+	cd /Users/g/LL/3p-google-breakpad/src && make -C /Users/g/LL/3p-google-breakpad/src -f /Users/g/LL/3p-google-breakpad/src/CMakeScripts/XCODE_DEPEND_HELPER.make PostBuild.exception_handler.$(CONFIGURATION)

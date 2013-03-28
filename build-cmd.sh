@@ -78,7 +78,7 @@ case "$AUTOBUILD_PLATFORM" in
             cmake -G Xcode CMakeLists.txt
             xcodebuild -project google_breakpad.xcodeproj -configuration Release
         )
-        xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj MACOSX_DEPLOYMENT_TARGET=10.6 -sdk macosx10.8 -configuration Release
+        xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj MACOSX_DEPLOYMENT_TARGET=10.6 -configuration Release
         mkdir -p "$INCLUDE_DIRECTORY/processor"
         mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
         mkdir -p "$INCLUDE_DIRECTORY/client/mac/crash_generation"
