@@ -17,14 +17,18 @@ set(exception_handler_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/client/mac/handler/dynamic_images.cc
     ${PROJECT_SOURCE_DIR}/client/mac/handler/exception_handler.cc
     ${PROJECT_SOURCE_DIR}/client/mac/handler/minidump_generator.cc
+    ${PROJECT_SOURCE_DIR}/client/mac/crash_generation/crash_generation_client.cc  
     ${PROJECT_SOURCE_DIR}/client/minidump_file_writer.cc
     ${PROJECT_SOURCE_DIR}/common/convert_UTF.c
     ${PROJECT_SOURCE_DIR}/common/string_conversion.cc
+    ${PROJECT_SOURCE_DIR}/common/md5.cc
     ${PROJECT_SOURCE_DIR}/common/mac/file_id.cc
     ${PROJECT_SOURCE_DIR}/common/mac/macho_id.cc
     ${PROJECT_SOURCE_DIR}/common/mac/macho_utilities.cc
     ${PROJECT_SOURCE_DIR}/common/mac/macho_walker.cc
     ${PROJECT_SOURCE_DIR}/common/mac/string_utilities.cc
+    ${PROJECT_SOURCE_DIR}/common/mac/MachIPC.mm
+    ${PROJECT_SOURCE_DIR}/common/mac/bootstrap_compat.cc
     )
 
 set(exception_handler_HEADER_FILES

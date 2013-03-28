@@ -17,7 +17,9 @@ def RunX64(exe, stdout):
     test.run_built_executable(exe, stdout=stdout)
   except WindowsError, e:
     # Assume the exe is 64-bit if it can't load on 32-bit systems.
-    if e.errno != 193:
+    # Both versions of the error are required because different versions
+    # of python seem to return different errors for invalid exe type.
+    if e.errno != 193 and '[Error 193]' not in str(e):
       raise
 
 

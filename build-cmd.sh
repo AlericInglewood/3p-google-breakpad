@@ -29,17 +29,23 @@ mkdir -p "$LIBRARY_DIRECTORY_DEBUG"
 mkdir -p "$LIBRARY_DIRECTORY_RELEASE"
 mkdir -p "$BINARY_DIRECTORY"
 mkdir -p "$INCLUDE_DIRECTORY"
+mkdir -p "$INCLUDE_DIRECTORY/common"
 
 case "$AUTOBUILD_PLATFORM" in
     "windows")
+        # patch vcproj generator to use Multi-Threaded DLL for +3 link karma
+        #
+        patch -p 1 < gyp.patch
         (
             cd src/client/windows
-            ../../tools/gyp/gyp -G msvs-version=2005
+            ../../tools/gyp/gyp --no-circular-check -f msvs -G msvs-version=2005
         )
         
         load_vsvars
         
         devenv.com src/client/windows/breakpad_client.sln /Upgrade
+        devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
+
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project exception_handler
         devenv.com src/client/windows/breakpad_client.sln /build "debug" /project exception_handler
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project crash_generation_client
@@ -47,35 +53,43 @@ case "$AUTOBUILD_PLATFORM" in
         devenv.com src/client/windows/breakpad_client.sln /build "release"  /project common
         devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project common
 
-        devenv.com src/tools/windows/dump_syms/dump_syms.vcproj /Upgrade
-	
         #using devenv directly - buildconsole doesn't support building vs2010 vcxproj files directly, yet
         devenv.com src/tools/windows/dump_syms/dump_syms.vcxproj /build "release|win32" 
+
         mkdir -p "$INCLUDE_DIRECTORY/client/windows/"{common,crash_generation}
         mkdir -p "$INCLUDE_DIRECTORY/common/windows"
         mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
         mkdir -p "$INCLUDE_DIRECTORY/processor"
+
         cp ./src/client/windows/handler/exception_handler.h "$INCLUDE_DIRECTORY"
-        cp src/client/windows/common/*.h "$INCLUDE_DIRECTORY/client/windows/common"
-        cp src/common/windows/*.h "$INCLUDE_DIRECTORY/common/windows"
-        cp src/client/windows/crash_generation/*.h "$INCLUDE_DIRECTORY/client/windows/crash_generation"
-        cp src/google_breakpad/common/*.h "$INCLUDE_DIRECTORY/google_breakpad/common"
-        cp src/processor/scoped_ptr.*h "$INCLUDE_DIRECTORY/processor"
+        cp ./src/client/windows/common/*.h "$INCLUDE_DIRECTORY/client/windows/common"
+        cp ./src/common/windows/*.h "$INCLUDE_DIRECTORY/common/windows"
+        cp ./src/client/windows/crash_generation/*.h "$INCLUDE_DIRECTORY/client/windows/crash_generation"
+        cp ./src/google_breakpad/common/*.h "$INCLUDE_DIRECTORY/google_breakpad/common"
         cp ./src/client/windows/Debug/lib/*.lib "$LIBRARY_DIRECTORY_DEBUG"
         cp ./src/client/windows/Release/lib/*.lib "$LIBRARY_DIRECTORY_RELEASE"
         cp ./src/tools/windows/dump_syms/Release/dump_syms.exe "$BINARY_DIRECTORY"
+        cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
+        cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
     ;;
     darwin)
         (
             cd src/
             cmake -G Xcode CMakeLists.txt
-            xcodebuild -project google_breakpad.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4 -configuration Release
+            xcodebuild -project google_breakpad.xcodeproj -configuration Release
         )
-		# *TODO - fix the release build of the dump_syms tool
-        xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4 -sdk macosx10.4 -configuration Debug
+        xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj MACOSX_DEPLOYMENT_TARGET=10.6 -sdk macosx10.8 -configuration Release
+        mkdir -p "$INCLUDE_DIRECTORY/processor"
+        mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
+        mkdir -p "$INCLUDE_DIRECTORY/client/mac/crash_generation"
+        mkdir -p "$INCLUDE_DIRECTORY/client/mac/crash_generation/common/mac"
         cp ./src/client/mac/handler/exception_handler.h "$INCLUDE_DIRECTORY"
+        cp ./src/client/mac/crash_generation/crash_generation_client.h "$INCLUDE_DIRECTORY/client/mac/crash_generation"
+        cp ./src/common/mac/MachIPC.h "$INCLUDE_DIRECTORY/client/mac/crash_generation/common/mac"
         cp ./src/client/mac/handler/Release/libexception_handler.dylib "$LIBRARY_DIRECTORY_RELEASE"
-        cp ./src/tools/mac/dump_syms/build/Debug/dump_syms "$BINARY_DIRECTORY"
+        cp ./src/tools/mac/dump_syms/build/Release/dump_syms "$BINARY_DIRECTORY"
+        cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
+        cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
     ;;
     linux)
         VIEWER_FLAGS="-m32 -fno-stack-protector"
@@ -83,15 +97,22 @@ case "$AUTOBUILD_PLATFORM" in
         make
         make -C src/tools/linux/dump_syms/ dump_syms CXX=g++-4.1
         make install
-        mkdir -p "$INCLUDE_DIRECTORY/client/linux/"{handler,crash_generation}
-        cp -P stage/lib/libbreakpad*.so* "$LIBRARY_DIRECTORY_RELEASE"
-        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
-        cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation"
         mkdir -p "$INCLUDE_DIRECTORY/processor"
-        cp src/processor/scoped_ptr.*h "$INCLUDE_DIRECTORY/processor"
+        mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
+        mkdir -p "$INCLUDE_DIRECTORY/client/linux/handler"
+        mkdir -p "$INCLUDE_DIRECTORY/client/linux/crash_generation"
+        cp -P stage/lib/libbreakpad*.a* "$LIBRARY_DIRECTORY_RELEASE"
+        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
+		cp ./src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY"
+		cp ./src/common/using_std_string.h "$INCLUDE_DIRECTORY"
+        cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation"
         cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
+        cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
+        cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
     ;;
 esac
+mkdir -p "$INCLUDE_DIRECTORY/common"
+# yes, this looks dumb, no, it's not incorrect
 mkdir -p stage/LICENSES
 cp COPYING stage/LICENSES/google_breakpad.txt
 

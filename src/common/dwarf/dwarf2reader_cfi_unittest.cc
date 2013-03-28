@@ -31,7 +31,9 @@
 
 // dwarf2reader_cfi_unittest.cc: Unit tests for dwarf2reader::CallFrameInfo
 
-#include <cstdlib>
+#include <stdlib.h>
+
+#include <string>
 #include <vector>
 
 // The '.eh_frame' format, used by the Linux C++ ABI for exception
@@ -45,9 +47,9 @@
 // interpretation against the test's intentions. Each ELF file is named
 // "cfitest-TEST", where TEST identifies the particular test.
 #ifdef WRITE_ELF
-#include <cstdio>
-#include <cerrno>
-#include <cstring>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 extern "C" {
 // To compile with WRITE_ELF, you should add the 'include' directory
 // of the binutils, gcc, or gdb source tree to your #include path;
@@ -60,13 +62,14 @@ extern "C" {
 #include "common/dwarf/bytereader-inl.h"
 #include "common/dwarf/cfi_assembler.h"
 #include "common/dwarf/dwarf2reader.h"
+#include "common/using_std_string.h"
 #include "google_breakpad/common/breakpad_types.h"
 
 using google_breakpad::CFISection;
-using google_breakpad::TestAssembler::Label;
-using google_breakpad::TestAssembler::kBigEndian;
-using google_breakpad::TestAssembler::kLittleEndian;
-using google_breakpad::TestAssembler::Section;
+using google_breakpad::test_assembler::Label;
+using google_breakpad::test_assembler::kBigEndian;
+using google_breakpad::test_assembler::kLittleEndian;
+using google_breakpad::test_assembler::Section;
 
 using dwarf2reader::DwarfPointerEncoding;
 using dwarf2reader::ENDIANNESS_BIG;
@@ -2315,7 +2318,7 @@ TEST_F(CFIReporter, ClearingCFARule) {
 #ifdef WRITE_ELF
 // See comments at the top of the file mentioning WRITE_ELF for details.
 
-using google_breakpad::TestAssembler::Section;
+using google_breakpad::test_assembler::Section;
 
 struct ELFSectionHeader {
   ELFSectionHeader(unsigned int set_type)

@@ -34,14 +34,14 @@
 #include <assert.h>
 #include <cxxabi.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include <algorithm>
 
 #include "common/stabs_to_module.h"
+#include "common/using_std_string.h"
 
 namespace google_breakpad {
-
-using std::string;
 
 // Demangle using abi call.
 // Older GCC may not support it.
@@ -58,7 +58,7 @@ static string Demangle(const string &mangled) {
 
 StabsToModule::~StabsToModule() {
   // Free any functions we've accumulated but not added to the module.
-  for (vector<Module::Function *>::iterator func_it = functions_.begin();
+  for (vector<Module::Function *>::const_iterator func_it = functions_.begin();
        func_it != functions_.end(); func_it++)
     delete *func_it;
   // Free any function that we're currently within.
@@ -104,16 +104,8 @@ bool StabsToModule::EndFunction(uint64_t address) {
   assert(current_function_);
   // Functions in this compilation unit should have address bigger
   // than the compilation unit's starting address.  There may be a lot
-  // of duplicated entries for functions in the STABS data; only one
-  // entry can meet this requirement.
-  //
-  // (I don't really understand the above comment; just bringing it along
-  // from the previous code, and leaving the behavior unchanged. GCC marks
-  // the end of each function with an N_FUN entry with no name, whose value
-  // is the size of the function; perhaps this test was concerned with
-  // skipping those. Now StabsReader interprets them properly. If you know
-  // the whole story, please patch this comment. --jimb)
-  //
+  // of duplicated entries for functions in the STABS data. We will
+  // count on the Module to remove the duplicates.
   if (current_function_->address >= comp_unit_base_address_)
     functions_.push_back(current_function_);
   else
@@ -140,6 +132,22 @@ bool StabsToModule::Line(uint64_t address, const char *name, int number) {
   return true;
 }
 
+bool StabsToModule::Extern(const string &name, uint64_t address) {
+  Module::Extern *ext = new Module::Extern;
+  // Older libstdc++ demangle implementations can crash on unexpected
+  // input, so be careful about what gets passed in.
+  if (name.compare(0, 3, "__Z") == 0) {
+    ext->name = Demangle(name.substr(1));
+  } else if (name[0] == '_') {
+    ext->name = name.substr(1);
+  } else {
+    ext->name = name;
+  }
+  ext->address = address;
+  module_->AddExtern(ext);
+  return true;
+}
+
 void StabsToModule::Warning(const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -153,12 +161,13 @@ void StabsToModule::Finalize() {
   // Sort all functions by address, just for neatness.
   sort(functions_.begin(), functions_.end(),
        Module::Function::CompareByAddress);
-  for (vector<Module::Function *>::iterator func_it = functions_.begin();
+
+  for (vector<Module::Function *>::const_iterator func_it = functions_.begin();
        func_it != functions_.end();
        func_it++) {
     Module::Function *f = *func_it;
     // Compute the function f's size.
-    vector<Module::Address>::iterator boundary
+    vector<Module::Address>::const_iterator boundary
         = std::upper_bound(boundaries_.begin(), boundaries_.end(), f->address);
     if (boundary != boundaries_.end())
       f->size = *boundary - f->address;

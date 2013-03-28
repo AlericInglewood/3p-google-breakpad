@@ -38,16 +38,16 @@ namespace google_breakpad {
 namespace SynthMinidump {
 
 Section::Section(const Dump &dump)
-  : TestAssembler::Section(dump.endianness()) { }
+  : test_assembler::Section(dump.endianness()) { }
 
-void Section::CiteLocationIn(TestAssembler::Section *section) const {
+void Section::CiteLocationIn(test_assembler::Section *section) const {
   if (this)
     (*section).D32(size_).D32(file_offset_);
   else
     (*section).D32(0).D32(0);
 }
 
-void Stream::CiteStreamIn(TestAssembler::Section *section) const {
+void Stream::CiteStreamIn(test_assembler::Section *section) const {
   section->D32(type_);
   CiteLocationIn(section);
 }
@@ -114,11 +114,11 @@ String::String(const Dump &dump, const string &contents) : Section(dump) {
     D16(*i);
 }
 
-void String::CiteStringIn(TestAssembler::Section *section) const {
+void String::CiteStringIn(test_assembler::Section *section) const {
   section->D32(file_offset_);
 }
 
-void Memory::CiteMemoryIn(TestAssembler::Section *section) const {
+void Memory::CiteMemoryIn(test_assembler::Section *section) const {
   section->D64(address_);
   CiteLocationIn(section);
 }
@@ -168,6 +168,25 @@ Context::Context(const Dump &dump, const MDRawContextX86 &context)
   // not need to be swapped.
   Append(context.extended_registers, sizeof(context.extended_registers));
   assert(Size() == sizeof(MDRawContextX86));
+}
+
+Context::Context(const Dump &dump, const MDRawContextARM &context)
+  : Section(dump) {
+  // The caller should have properly set the CPU type flag.
+  assert((context.context_flags & MD_CONTEXT_ARM) ||
+         (context.context_flags & MD_CONTEXT_ARM_OLD));
+  // It doesn't make sense to store ARM registers in big-endian form.
+  assert(dump.endianness() == kLittleEndian);
+  D32(context.context_flags);
+  for (int i = 0; i < MD_CONTEXT_ARM_GPR_COUNT; ++i)
+    D32(context.iregs[i]);
+  D32(context.cpsr);
+  D64(context.float_save.fpscr);
+  for (int i = 0; i < MD_FLOATINGSAVEAREA_ARM_FPR_COUNT; ++i)
+    D64(context.float_save.regs[i]);
+  for (int i = 0; i < MD_FLOATINGSAVEAREA_ARM_FPEXTRA_COUNT; ++i)
+    D32(context.float_save.extra[i]);
+  assert(Size() == sizeof(MDRawContextARM));
 }
 
 Thread::Thread(const Dump &dump,
@@ -231,13 +250,34 @@ const MDVSFixedFileInfo Module::stock_version_info = {
   MD_VSFIXEDFILEINFO_FILE_SUBTYPE_UNKNOWN, // file_subtype
   0,                                    // file_date_hi
   0                                     // file_date_lo
-};  
+};
+
+Exception::Exception(const Dump &dump,
+                     const Context &context,
+                     u_int32_t thread_id,
+                     u_int32_t exception_code,
+                     u_int32_t exception_flags,
+                     u_int64_t exception_address)
+  : Stream(dump, MD_EXCEPTION_STREAM) {
+  D32(thread_id);
+  D32(0);  // __align
+  D32(exception_code);
+  D32(exception_flags);
+  D64(0);  // exception_record
+  D64(exception_address);
+  D32(0);  // number_parameters
+  D32(0);  // __align
+  for (int i = 0; i < MD_EXCEPTION_MAXIMUM_PARAMETERS; ++i)
+    D64(0);  // exception_information
+  context.CiteLocationIn(this);
+  assert(Size() == sizeof(MDRawExceptionStream));
+}
 
 Dump::Dump(u_int64_t flags,
            Endianness endianness,
            u_int32_t version,
            u_int32_t date_time_stamp)
-    : TestAssembler::Section(endianness),
+    : test_assembler::Section(endianness),
       file_start_(0),
       stream_directory_(*this),
       stream_count_(0),
@@ -301,7 +341,7 @@ void Dump::Finish() {
   // has the stream count and MDRVA.
   stream_count_label_ = stream_count_;
   stream_directory_rva_ = file_start_ + Size();
-  Append(static_cast<TestAssembler::Section &>(stream_directory_));
+  Append(static_cast<test_assembler::Section &>(stream_directory_));
 }
 
 } // namespace SynthMinidump

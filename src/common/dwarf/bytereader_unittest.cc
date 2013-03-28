@@ -37,17 +37,17 @@
 #include "common/dwarf/bytereader.h"
 #include "common/dwarf/bytereader-inl.h"
 #include "common/dwarf/cfi_assembler.h"
+#include "common/using_std_string.h"
 
 using dwarf2reader::ByteReader;
 using dwarf2reader::DwarfPointerEncoding;
 using dwarf2reader::ENDIANNESS_BIG;
 using dwarf2reader::ENDIANNESS_LITTLE;
 using google_breakpad::CFISection;
-using google_breakpad::TestAssembler::Label;
-using google_breakpad::TestAssembler::kBigEndian;
-using google_breakpad::TestAssembler::kLittleEndian;
-using google_breakpad::TestAssembler::Section;
-using std::string;
+using google_breakpad::test_assembler::Label;
+using google_breakpad::test_assembler::kBigEndian;
+using google_breakpad::test_assembler::kLittleEndian;
+using google_breakpad::test_assembler::Section;
 using testing::Test;
 
 struct ReaderFixture {

@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-# Copyright (c) 2009 Google Inc. All rights reserved.
+# Copyright (c) 2012 Google Inc. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -45,6 +43,12 @@ path_sections = []
 
 
 def IsPathSection(section):
+  # If section ends in one of these characters, it's applied to a section
+  # without the trailing characters.  '/' is notably absent from this list,
+  # because there's no way for a regular expression to be treated as a path.
+  while section[-1:] in ('=', '+', '?', '!'):
+    section = section[0:-1]
+
   if section in path_sections or \
      section.endswith('_dir') or section.endswith('_dirs') or \
      section.endswith('_file') or section.endswith('_files') or \
@@ -71,12 +75,12 @@ base_non_configuration_keys = [
   'product_dir',
   'product_extension',
   'product_name',
+  'product_prefix',
   'rules',
   'run_as',
   'sources',
   'suppress_wildcard',
   'target_name',
-  'test',
   'toolset',
   'toolsets',
   'type',
@@ -87,6 +91,20 @@ base_non_configuration_keys = [
   'variables',
 ]
 non_configuration_keys = []
+
+# Keys that do not belong inside a configuration dictionary.
+invalid_configuration_keys = [
+  'actions',
+  'all_dependent_settings',
+  'configurations',
+  'dependencies',
+  'direct_dependent_settings',
+  'libraries',
+  'link_settings',
+  'sources',
+  'target_name',
+  'type',
+]
 
 # Controls how the generator want the build file paths.
 absolute_build_file_paths = False
@@ -146,10 +164,10 @@ def CheckedEval(file_contents):
   assert isinstance(c2[0], Discard)
   c3 = c2[0].getChildren()
   assert len(c3) == 1
-  return CheckNode(c3[0],0)
+  return CheckNode(c3[0], [])
 
 
-def CheckNode(node, level):
+def CheckNode(node, keypath):
   if isinstance(node, Dict):
     c = node.getChildren()
     dict = {}
@@ -158,19 +176,25 @@ def CheckNode(node, level):
       key = c[n].getChildren()[0]
       if key in dict:
         raise KeyError, "Key '" + key + "' repeated at level " + \
-              repr(level)
-      dict[key] = CheckNode(c[n + 1], level + 1)
+              repr(len(keypath) + 1) + " with key path '" + \
+              '.'.join(keypath) + "'"
+      kp = list(keypath)  # Make a copy of the list for descending this node.
+      kp.append(key)
+      dict[key] = CheckNode(c[n + 1], kp)
     return dict
   elif isinstance(node, List):
     c = node.getChildren()
-    list = []
-    for child in c:
-      list.append(CheckNode(child, level + 1))
-    return list
+    children = []
+    for index, child in enumerate(c):
+      kp = list(keypath)  # Copy list.
+      kp.append(repr(index))
+      children.append(CheckNode(child, kp))
+    return children
   elif isinstance(node, Const):
     return node.getChildren()[0]
   else:
-    raise TypeError, "Unknown AST node " + repr(node)
+    raise TypeError, "Unknown AST node at key path '" + '.'.join(keypath) + \
+         "': " + repr(node)
 
 
 def LoadOneBuildFile(build_file_path, data, aux_data, variables, includes,
@@ -273,11 +297,18 @@ def ProcessToolsetsInDict(data):
     target_list = data['targets']
     new_target_list = []
     for target in target_list:
-      global multiple_toolsets
+      # If this target already has an explicit 'toolset', and no 'toolsets'
+      # list, don't modify it further.
+      if 'toolset' in target and 'toolsets' not in target:
+        new_target_list.append(target)
+        continue
       if multiple_toolsets:
         toolsets = target.get('toolsets', ['target'])
       else:
         toolsets = ['target']
+      # Make sure this 'toolsets' definition is only processed once.
+      if 'toolsets' in target:
+        del target['toolsets']
       if len(toolsets) > 0:
         # Optimization: only do copies if more than one toolset is specified.
         for build in toolsets[1:]:
@@ -299,16 +330,17 @@ def ProcessToolsetsInDict(data):
 # that contains the targets...
 def LoadTargetBuildFile(build_file_path, data, aux_data, variables, includes,
                         depth, check):
-  global absolute_build_file_paths
-
   # If depth is set, predefine the DEPTH variable to be a relative path from
   # this build file's directory to the directory identified by depth.
   if depth:
+    # TODO(dglazkov) The backslash/forward-slash replacement at the end is a
+    # temporary measure. This should really be addressed by keeping all paths
+    # in POSIX until actual project generation.
     d = gyp.common.RelativePath(depth, os.path.dirname(build_file_path))
     if d == '':
       variables['DEPTH'] = '.'
     else:
-      variables['DEPTH'] = d
+      variables['DEPTH'] = d.replace('\\', '/')
 
   # If the generator needs absolue paths, then do so.
   if absolute_build_file_paths:
@@ -343,11 +375,17 @@ def LoadTargetBuildFile(build_file_path, data, aux_data, variables, includes,
                                 os.path.dirname(build_file_path))
     build_file_data['included_files'].append(included_relative)
 
+  # Do a first round of toolsets expansion so that conditions can be defined
+  # per toolset.
   ProcessToolsetsInDict(build_file_data)
 
   # Apply "pre"/"early" variable expansions and condition evaluations.
-  ProcessVariablesAndConditionsInDict(build_file_data, False, variables,
-                                      build_file_path)
+  ProcessVariablesAndConditionsInDict(
+      build_file_data, PHASE_EARLY, variables, build_file_path)
+
+  # Since some toolsets might have been defined conditionally, perform
+  # a second round of toolsets expansion now.
+  ProcessToolsetsInDict(build_file_data)
 
   # Look at each project's target_defaults dict, and merge settings into
   # targets.
@@ -442,127 +480,231 @@ def IsStrCanonicalInt(string):
   return True
 
 
-early_variable_re = re.compile('(?P<replace>(?P<type><!?@?)'
-                               '\((?P<is_array>\s*\[?)'
-                               '(?P<content>.*?)(\]?)\))')
-late_variable_re = re.compile('(?P<replace>(?P<type>>!?@?)'
-                              '\((?P<is_array>\s*\[?)'
-                              '(?P<content>.*?)(\]?)\))')
+# This matches things like "<(asdf)", "<!(cmd)", "<!@(cmd)", "<|(list)",
+# "<!interpreter(arguments)", "<([list])", and even "<([)" and "<(<())".
+# In the last case, the inner "<()" is captured in match['content'].
+early_variable_re = re.compile(
+    '(?P<replace>(?P<type><(?:(?:!?@?)|\|)?)'
+    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    '\((?P<is_array>\s*\[?)'
+    '(?P<content>.*?)(\]?)\))')
+
+# This matches the same as early_variable_re, but with '>' instead of '<'.
+late_variable_re = re.compile(
+    '(?P<replace>(?P<type>>(?:(?:!?@?)|\|)?)'
+    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    '\((?P<is_array>\s*\[?)'
+    '(?P<content>.*?)(\]?)\))')
+
+# This matches the same as early_variable_re, but with '^' instead of '<'.
+latelate_variable_re = re.compile(
+    '(?P<replace>(?P<type>[\^](?:(?:!?@?)|\|)?)'
+    '(?P<command_string>[-a-zA-Z0-9_.]+)?'
+    '\((?P<is_array>\s*\[?)'
+    '(?P<content>.*?)(\]?)\))')
 
 # Global cache of results from running commands so they don't have to be run
 # more then once.
 cached_command_results = {}
 
-def ExpandVariables(input, is_late, variables, build_file):
+
+def FixupPlatformCommand(cmd):
+  if sys.platform == 'win32':
+    if type(cmd) == list:
+      cmd = [re.sub('^cat ', 'type ', cmd[0])] + cmd[1:]
+    else:
+      cmd = re.sub('^cat ', 'type ', cmd)
+  return cmd
+
+
+PHASE_EARLY = 0
+PHASE_LATE = 1
+PHASE_LATELATE = 2
+
+
+def ExpandVariables(input, phase, variables, build_file):
   # Look for the pattern that gets expanded into variables
-  if not is_late:
+  if phase == PHASE_EARLY:
     variable_re = early_variable_re
-  else:
+    expansion_symbol = '<'
+  elif phase == PHASE_LATE:
     variable_re = late_variable_re
+    expansion_symbol = '>'
+  elif phase == PHASE_LATELATE:
+    variable_re = latelate_variable_re
+    expansion_symbol = '^'
+  else:
+    assert False
 
   input_str = str(input)
+  if IsStrCanonicalInt(input_str):
+    return int(input_str)
+
+  # Do a quick scan to determine if an expensive regex search is warranted.
+  if expansion_symbol not in input_str:
+    return input_str
 
   # Get the entire list of matches as a list of MatchObject instances.
-  # (using findall here would return strings, and we want
-  # MatchObjects).
+  # (using findall here would return strings instead of MatchObjects).
   matches = [match for match in variable_re.finditer(input_str)]
+  if not matches:
+    return input_str
 
   output = input_str
-  if matches:
-    # Reverse the list of matches so that replacements are done right-to-left.
-    # That ensures that earlier replacements won't mess up the string in a
-    # way that causes later calls to find the earlier substituted text instead
-    # of what's intended for replacement.
-    matches.reverse()
-    for match_group in matches:
-      match = match_group.groupdict()
-      gyp.DebugOutput(gyp.DEBUG_VARIABLES,
-                      "Matches: %s" % repr(match))
-      # match['replace'] is the substring to look for, match['type']
-      # is the character code for the replacement type (< > <! >! <@
-      # >@ <!@ >!@), match['is_array'] contains a '[' for command
-      # arrays, and match['content'] is the name of the variable (< >)
-      # or command to run (<! >!).
+  # Reverse the list of matches so that replacements are done right-to-left.
+  # That ensures that earlier replacements won't mess up the string in a
+  # way that causes later calls to find the earlier substituted text instead
+  # of what's intended for replacement.
+  matches.reverse()
+  for match_group in matches:
+    match = match_group.groupdict()
+    gyp.DebugOutput(gyp.DEBUG_VARIABLES,
+                    "Matches: %s" % repr(match))
+    # match['replace'] is the substring to look for, match['type']
+    # is the character code for the replacement type (< > <! >! <| >| <@
+    # >@ <!@ >!@), match['is_array'] contains a '[' for command
+    # arrays, and match['content'] is the name of the variable (< >)
+    # or command to run (<! >!). match['command_string'] is an optional
+    # command string. Currently, only 'pymod_do_main' is supported.
 
-      # run_command is true if a ! variant is used.
-      run_command = '!' in match['type']
+    # run_command is true if a ! variant is used.
+    run_command = '!' in match['type']
+    command_string = match['command_string']
 
-      # Capture these now so we can adjust them later.
-      replace_start = match_group.start('replace')
-      replace_end = match_group.end('replace')
+    # file_list is true if a | variant is used.
+    file_list = '|' in match['type']
 
-      # Find the ending paren, and re-evaluate the contained string.
-      (c_start, c_end) = FindEnclosingBracketGroup(input_str[replace_start:])
+    # Capture these now so we can adjust them later.
+    replace_start = match_group.start('replace')
+    replace_end = match_group.end('replace')
 
-      # Adjust the replacement range to match the entire command
-      # found by FindEnclosingBracketGroup (since the variable_re
-      # probably doesn't match the entire command if it contained
-      # nested variables).
-      replace_end = replace_start + c_end
+    # Find the ending paren, and re-evaluate the contained string.
+    (c_start, c_end) = FindEnclosingBracketGroup(input_str[replace_start:])
 
-      # Find the "real" replacement, matching the appropriate closing
-      # paren, and adjust the replacement start and end.
-      replacement = input_str[replace_start:replace_end]
+    # Adjust the replacement range to match the entire command
+    # found by FindEnclosingBracketGroup (since the variable_re
+    # probably doesn't match the entire command if it contained
+    # nested variables).
+    replace_end = replace_start + c_end
 
-      # Figure out what the contents of the variable parens are.
-      contents_start = replace_start + c_start + 1
-      contents_end = replace_end - 1
-      contents = input_str[contents_start:contents_end]
+    # Find the "real" replacement, matching the appropriate closing
+    # paren, and adjust the replacement start and end.
+    replacement = input_str[replace_start:replace_end]
 
+    # Figure out what the contents of the variable parens are.
+    contents_start = replace_start + c_start + 1
+    contents_end = replace_end - 1
+    contents = input_str[contents_start:contents_end]
+
+    # Do filter substitution now for <|().
+    # Admittedly, this is different than the evaluation order in other
+    # contexts. However, since filtration has no chance to run on <|(),
+    # this seems like the only obvious way to give them access to filters.
+    if file_list:
+      processed_variables = copy.deepcopy(variables)
+      ProcessListFiltersInDict(contents, processed_variables)
       # Recurse to expand variables in the contents
-      contents = ExpandVariables(contents, is_late, variables, build_file)
+      contents = ExpandVariables(contents, phase,
+                                 processed_variables, build_file)
+    else:
+      # Recurse to expand variables in the contents
+      contents = ExpandVariables(contents, phase, variables, build_file)
 
-      # Strip off leading/trailing whitespace so that variable matches are
-      # simpler below (and because they are rarely needed).
-      contents = contents.strip()
+    # Strip off leading/trailing whitespace so that variable matches are
+    # simpler below (and because they are rarely needed).
+    contents = contents.strip()
 
-      # expand_to_list is true if an @ variant is used.  In that case,
-      # the expansion should result in a list.  Note that the caller
-      # is to be expecting a list in return, and not all callers do
-      # because not all are working in list context.  Also, for list
-      # expansions, there can be no other text besides the variable
-      # expansion in the input string.
-      expand_to_list = '@' in match['type'] and input_str == replacement
+    # expand_to_list is true if an @ variant is used.  In that case,
+    # the expansion should result in a list.  Note that the caller
+    # is to be expecting a list in return, and not all callers do
+    # because not all are working in list context.  Also, for list
+    # expansions, there can be no other text besides the variable
+    # expansion in the input string.
+    expand_to_list = '@' in match['type'] and input_str == replacement
 
-      if run_command:
-        # Run the command in the build file's directory.
-        build_file_dir = os.path.dirname(build_file)
-        if build_file_dir == '':
-          # If build_file is just a leaf filename indicating a file in the
-          # current directory, build_file_dir might be an empty string.  Set
-          # it to None to signal to subprocess.Popen that it should run the
-          # command in the current directory.
-          build_file_dir = None
+    if run_command or file_list:
+      # Find the build file's directory, so commands can be run or file lists
+      # generated relative to it.
+      build_file_dir = os.path.dirname(build_file)
+      if build_file_dir == '':
+        # If build_file is just a leaf filename indicating a file in the
+        # current directory, build_file_dir might be an empty string.  Set
+        # it to None to signal to subprocess.Popen that it should run the
+        # command in the current directory.
+        build_file_dir = None
 
-        use_shell = True
-        if match['is_array']:
-          contents = eval(contents)
-          use_shell = False
+    # Support <|(listfile.txt ...) which generates a file
+    # containing items from a gyp list, generated at gyp time.
+    # This works around actions/rules which have more inputs than will
+    # fit on the command line.
+    if file_list:
+      if type(contents) == list:
+        contents_list = contents
+      else:
+        contents_list = contents.split(' ')
+      replacement = contents_list[0]
+      path = replacement
+      if not os.path.isabs(path):
+        path = os.path.join(build_file_dir, path)
+      f = gyp.common.WriteOnDiff(path)
+      for i in contents_list[1:]:
+        f.write('%s\n' % i)
+      f.close()
 
-        # Check for a cached value to avoid executing commands more than once.
-        # TODO(http://code.google.com/p/gyp/issues/detail?id=112): It is
-        # possible that the command being invoked depends on the current
-        # directory. For that case the syntax needs to be extended so that the
-        # directory is also used in cache_key (it becomes a tuple).
-        # TODO(http://code.google.com/p/gyp/issues/detail?id=111): In theory,
-        # someone could author a set of GYP files where each time the command
-        # is invoked it produces different output by design. When the need
-        # arises, the syntax should be extended to support no caching off a
-        # command's output so it is run every time.
-        cache_key = str(contents)
-        cached_value = cached_command_results.get(cache_key, None)
-        if cached_value is None:
-          gyp.DebugOutput(gyp.DEBUG_VARIABLES,
-                          "Executing command '%s' in directory '%s'" %
-                          (contents,build_file_dir))
+    elif run_command:
+      use_shell = True
+      if match['is_array']:
+        contents = eval(contents)
+        use_shell = False
 
+      # Check for a cached value to avoid executing commands, or generating
+      # file lists more than once.
+      # TODO(http://code.google.com/p/gyp/issues/detail?id=112): It is
+      # possible that the command being invoked depends on the current
+      # directory. For that case the syntax needs to be extended so that the
+      # directory is also used in cache_key (it becomes a tuple).
+      # TODO(http://code.google.com/p/gyp/issues/detail?id=111): In theory,
+      # someone could author a set of GYP files where each time the command
+      # is invoked it produces different output by design. When the need
+      # arises, the syntax should be extended to support no caching off a
+      # command's output so it is run every time.
+      cache_key = str(contents)
+      cached_value = cached_command_results.get(cache_key, None)
+      if cached_value is None:
+        gyp.DebugOutput(gyp.DEBUG_VARIABLES,
+                        "Executing command '%s' in directory '%s'" %
+                        (contents,build_file_dir))
+
+        replacement = ''
+
+        if command_string == 'pymod_do_main':
+          # <!pymod_do_main(modulename param eters) loads |modulename| as a
+          # python module and then calls that module's DoMain() function,
+          # passing ["param", "eters"] as a single list argument. For modules
+          # that don't load quickly, this can be faster than
+          # <!(python modulename param eters). Do this in |build_file_dir|.
+          oldwd = os.getcwd()  # Python doesn't like os.open('.'): no fchdir.
+          os.chdir(build_file_dir)
+
+          parsed_contents = shlex.split(contents)
+          py_module = __import__(parsed_contents[0])
+          replacement = str(py_module.DoMain(parsed_contents[1:])).rstrip()
+
+          os.chdir(oldwd)
+          assert replacement != None
+        elif command_string:
+          raise Exception("Unknown command string '%s' in '%s'." %
+                          (command_string, contents))
+        else:
+          # Fix up command with platform specific workarounds.
+          contents = FixupPlatformCommand(contents)
           p = subprocess.Popen(contents, shell=use_shell,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                stdin=subprocess.PIPE,
                                cwd=build_file_dir)
 
-          (p_stdout, p_stderr) = p.communicate('')
+          p_stdout, p_stderr = p.communicate('')
 
           if p.wait() != 0 or p_stderr:
             sys.stderr.write(p_stderr)
@@ -570,82 +712,102 @@ def ExpandVariables(input, is_late, variables, build_file):
             # in python 2.5 and later.
             raise Exception("Call to '%s' returned exit status %d." %
                             (contents, p.returncode))
-
           replacement = p_stdout.rstrip()
-          cached_command_results[cache_key] = replacement
-        else:
-          gyp.DebugOutput(gyp.DEBUG_VARIABLES,
-                          "Had cache value for command '%s' in directory '%s'" %
-                          (contents,build_file_dir))
-          replacement = cached_value
 
+        cached_command_results[cache_key] = replacement
       else:
-        if not contents in variables:
+        gyp.DebugOutput(gyp.DEBUG_VARIABLES,
+                        "Had cache value for command '%s' in directory '%s'" %
+                        (contents,build_file_dir))
+        replacement = cached_value
+
+    else:
+      if not contents in variables:
+        if contents[-1] in ['!', '/']:
+          # In order to allow cross-compiles (nacl) to happen more naturally,
+          # we will allow references to >(sources/) etc. to resolve to
+          # and empty list if undefined. This allows actions to:
+          # 'action!': [
+          #   '>@(_sources!)',
+          # ],
+          # 'action/': [
+          #   '>@(_sources/)',
+          # ],
+          replacement = []
+        else:
           raise KeyError, 'Undefined variable ' + contents + \
                           ' in ' + build_file
+      else:
         replacement = variables[contents]
 
+    if isinstance(replacement, list):
+      for item in replacement:
+        if (not contents[-1] == '/' and
+            not isinstance(item, str) and not isinstance(item, int)):
+          raise TypeError, 'Variable ' + contents + \
+                           ' must expand to a string or list of strings; ' + \
+                           'list contains a ' + \
+                           item.__class__.__name__
+      # Run through the list and handle variable expansions in it.  Since
+      # the list is guaranteed not to contain dicts, this won't do anything
+      # with conditions sections.
+      ProcessVariablesAndConditionsInList(replacement, phase, variables,
+                                          build_file)
+    elif not isinstance(replacement, str) and \
+         not isinstance(replacement, int):
+          raise TypeError, 'Variable ' + contents + \
+                           ' must expand to a string or list of strings; ' + \
+                           'found a ' + replacement.__class__.__name__
+
+    if expand_to_list:
+      # Expanding in list context.  It's guaranteed that there's only one
+      # replacement to do in |input_str| and that it's this replacement.  See
+      # above.
       if isinstance(replacement, list):
-        for item in replacement:
-          if not isinstance(item, str) and not isinstance(item, int):
-            raise TypeError, 'Variable ' + contents + \
-                             ' must expand to a string or list of strings; ' + \
-                             'list contains a ' + \
-                             item.__class__.__name__
-        # Run through the list and handle variable expansions in it.  Since
-        # the list is guaranteed not to contain dicts, this won't do anything
-        # with conditions sections.
-        ProcessVariablesAndConditionsInList(replacement, is_late, variables,
-                                            build_file)
-      elif not isinstance(replacement, str) and \
-           not isinstance(replacement, int):
-            raise TypeError, 'Variable ' + contents + \
-                             ' must expand to a string or list of strings; ' + \
-                             'found a ' + replacement.__class__.__name__
-
-      if expand_to_list:
-        # Expanding in list context.  It's guaranteed that there's only one
-        # replacement to do in |input_str| and that it's this replacement.  See
-        # above.
-        if isinstance(replacement, list):
-          # If it's already a list, make a copy.
-          output = replacement[:]
-        else:
-          # Split it the same way sh would split arguments.
-          output = shlex.split(str(replacement))
+        # If it's already a list, make a copy.
+        output = replacement[:]
       else:
-        # Expanding in string context.
-        encoded_replacement = ''
-        if isinstance(replacement, list):
-          # When expanding a list into string context, turn the list items
-          # into a string in a way that will work with a subprocess call.
-          #
-          # TODO(mark): This isn't completely correct.  This should
-          # call a generator-provided function that observes the
-          # proper list-to-argument quoting rules on a specific
-          # platform instead of just calling the POSIX encoding
-          # routine.
-          encoded_replacement = gyp.common.EncodePOSIXShellList(replacement)
-        else:
-          encoded_replacement = replacement
+        # Split it the same way sh would split arguments.
+        output = shlex.split(str(replacement))
+    else:
+      # Expanding in string context.
+      encoded_replacement = ''
+      if isinstance(replacement, list):
+        # When expanding a list into string context, turn the list items
+        # into a string in a way that will work with a subprocess call.
+        #
+        # TODO(mark): This isn't completely correct.  This should
+        # call a generator-provided function that observes the
+        # proper list-to-argument quoting rules on a specific
+        # platform instead of just calling the POSIX encoding
+        # routine.
+        encoded_replacement = gyp.common.EncodePOSIXShellList(replacement)
+      else:
+        encoded_replacement = replacement
 
-        output = output[:replace_start] + str(encoded_replacement) + \
-                 output[replace_end:]
-      # Prepare for the next match iteration.
-      input_str = output
+      output = output[:replace_start] + str(encoded_replacement) + \
+               output[replace_end:]
+    # Prepare for the next match iteration.
+    input_str = output
 
-    # Look for more matches now that we've replaced some, to deal with
-    # expanding local variables (variables defined in the same
-    # variables block as this one).
-    gyp.DebugOutput(gyp.DEBUG_VARIABLES,
-                    "Found output %s, recursing." % repr(output))
-    if isinstance(output, list):
+  # Look for more matches now that we've replaced some, to deal with
+  # expanding local variables (variables defined in the same
+  # variables block as this one).
+  gyp.DebugOutput(gyp.DEBUG_VARIABLES,
+                  "Found output %s, recursing." % repr(output))
+  if isinstance(output, list):
+    if output and isinstance(output[0], list):
+      # Leave output alone if it's a list of lists.
+      # We don't want such lists to be stringified.
+      pass
+    else:
       new_output = []
       for item in output:
-        new_output.append(ExpandVariables(item, is_late, variables, build_file))
+        new_output.append(
+            ExpandVariables(item, phase, variables, build_file))
       output = new_output
-    else:
-      output = ExpandVariables(output, is_late, variables, build_file)
+  else:
+    output = ExpandVariables(output, phase, variables, build_file)
 
   # Convert all strings that are canonically-represented integers into integers.
   if isinstance(output, list):
@@ -655,14 +817,15 @@ def ExpandVariables(input, is_late, variables, build_file):
   elif IsStrCanonicalInt(output):
     output = int(output)
 
-  gyp.DebugOutput(gyp.DEBUG_VARIABLES,
-                  "Expanding %s to %s" % (repr(input), repr(output)))
   return output
 
 
-def ProcessConditionsInDict(the_dict, is_late, variables, build_file):
+def ProcessConditionsInDict(the_dict, phase, variables, build_file):
   # Process a 'conditions' or 'target_conditions' section in the_dict,
-  # depending on is_late.  If is_late is False, 'conditions' is used.
+  # depending on phase.
+  # early -> conditions
+  # late -> target_conditions
+  # latelate -> no conditions
   #
   # Each item in a conditions list consists of cond_expr, a string expression
   # evaluated as the condition, and true_dict, a dict that will be merged into
@@ -671,13 +834,17 @@ def ProcessConditionsInDict(the_dict, is_late, variables, build_file):
   # cond_expr evaluates to false.
   #
   # Any dict merged into the_dict will be recursively processed for nested
-  # conditionals and other expansions, also according to is_late, immediately
+  # conditionals and other expansions, also according to phase, immediately
   # prior to being merged.
 
-  if not is_late:
+  if phase == PHASE_EARLY:
     conditions_key = 'conditions'
-  else:
+  elif phase == PHASE_LATE:
     conditions_key = 'target_conditions'
+  elif phase == PHASE_LATELATE:
+    return
+  else:
+    assert False
 
   if not conditions_key in the_dict:
     return
@@ -693,7 +860,7 @@ def ProcessConditionsInDict(the_dict, is_late, variables, build_file):
       # It's possible that condition[0] won't work in which case this
       # attempt will raise its own IndexError.  That's probably fine.
       raise IndexError, conditions_key + ' ' + condition[0] + \
-                        ' must be length 2 or 3, not ' + len(condition)
+                        ' must be length 2 or 3, not ' + str(len(condition))
 
     [cond_expr, true_dict] = condition[0:2]
     false_dict = None
@@ -704,7 +871,7 @@ def ProcessConditionsInDict(the_dict, is_late, variables, build_file):
     # contain variable references without needing to resort to GYP expansion
     # syntax, this is of dubious value for variables, but someone might want to
     # use a command expansion directly inside a condition.
-    cond_expr_expanded = ExpandVariables(cond_expr, is_late, variables,
+    cond_expr_expanded = ExpandVariables(cond_expr, phase, variables,
                                          build_file)
     if not isinstance(cond_expr_expanded, str) and \
        not isinstance(cond_expr_expanded, int):
@@ -733,7 +900,7 @@ def ProcessConditionsInDict(the_dict, is_late, variables, build_file):
     if merge_dict != None:
       # Expand variables and nested conditinals in the merge_dict before
       # merging it.
-      ProcessVariablesAndConditionsInDict(merge_dict, is_late,
+      ProcessVariablesAndConditionsInDict(merge_dict, phase,
                                           variables, build_file)
 
       MergeDicts(the_dict, merge_dict, build_file, build_file)
@@ -777,7 +944,7 @@ def LoadVariablesFromVariablesDict(variables, the_dict, the_dict_key):
     variables[variable_name] = value
 
 
-def ProcessVariablesAndConditionsInDict(the_dict, is_late, variables_in,
+def ProcessVariablesAndConditionsInDict(the_dict, phase, variables_in,
                                         build_file, the_dict_key=None):
   """Handle all variable and command expansion and conditional evaluation.
 
@@ -804,7 +971,7 @@ def ProcessVariablesAndConditionsInDict(the_dict, is_late, variables_in,
     # Pass a copy of the variables dict to avoid having it be tainted.
     # Otherwise, it would have extra automatics added for everything that
     # should just be an ordinary variable in this scope.
-    ProcessVariablesAndConditionsInDict(the_dict['variables'], is_late,
+    ProcessVariablesAndConditionsInDict(the_dict['variables'], phase,
                                         variables, build_file, 'variables')
 
   LoadVariablesFromVariablesDict(variables, the_dict, the_dict_key)
@@ -812,7 +979,7 @@ def ProcessVariablesAndConditionsInDict(the_dict, is_late, variables_in,
   for key, value in the_dict.iteritems():
     # Skip "variables", which was already processed if present.
     if key != 'variables' and isinstance(value, str):
-      expanded = ExpandVariables(value, is_late, variables, build_file)
+      expanded = ExpandVariables(value, phase, variables, build_file)
       if not isinstance(expanded, str) and not isinstance(expanded, int):
         raise ValueError, \
               'Variable expansion in this context permits str and int ' + \
@@ -857,7 +1024,7 @@ def ProcessVariablesAndConditionsInDict(the_dict, is_late, variables_in,
   # 'target_conditions' section, perform appropriate merging and recursive
   # conditional and variable processing, and then remove the conditions section
   # from the_dict if it is present.
-  ProcessConditionsInDict(the_dict, is_late, variables, build_file)
+  ProcessConditionsInDict(the_dict, phase, variables, build_file)
 
   # Conditional processing may have resulted in changes to automatics or the
   # variables dict.  Reload.
@@ -875,21 +1042,21 @@ def ProcessVariablesAndConditionsInDict(the_dict, is_late, variables_in,
     if isinstance(value, dict):
       # Pass a copy of the variables dict so that subdicts can't influence
       # parents.
-      ProcessVariablesAndConditionsInDict(value, is_late, variables,
+      ProcessVariablesAndConditionsInDict(value, phase, variables,
                                           build_file, key)
     elif isinstance(value, list):
       # The list itself can't influence the variables dict, and
       # ProcessVariablesAndConditionsInList will make copies of the variables
       # dict if it needs to pass it to something that can influence it.  No
       # copy is necessary here.
-      ProcessVariablesAndConditionsInList(value, is_late, variables,
+      ProcessVariablesAndConditionsInList(value, phase, variables,
                                           build_file)
     elif not isinstance(value, int):
       raise TypeError, 'Unknown type ' + value.__class__.__name__ + \
                        ' for ' + key
 
 
-def ProcessVariablesAndConditionsInList(the_list, is_late, variables,
+def ProcessVariablesAndConditionsInList(the_list, phase, variables,
                                         build_file):
   # Iterate using an index so that new values can be assigned into the_list.
   index = 0
@@ -898,18 +1065,16 @@ def ProcessVariablesAndConditionsInList(the_list, is_late, variables,
     if isinstance(item, dict):
       # Make a copy of the variables dict so that it won't influence anything
       # outside of its own scope.
-      ProcessVariablesAndConditionsInDict(item, is_late, variables, build_file)
+      ProcessVariablesAndConditionsInDict(item, phase, variables, build_file)
     elif isinstance(item, list):
-      ProcessVariablesAndConditionsInList(item, is_late, variables, build_file)
+      ProcessVariablesAndConditionsInList(item, phase, variables, build_file)
     elif isinstance(item, str):
-      expanded = ExpandVariables(item, is_late, variables, build_file)
+      expanded = ExpandVariables(item, phase, variables, build_file)
       if isinstance(expanded, str) or isinstance(expanded, int):
         the_list[index] = expanded
       elif isinstance(expanded, list):
-        del the_list[index]
-        for expanded_item in expanded:
-          the_list.insert(index, expanded_item)
-          index = index + 1
+        the_list[index:index+1] = expanded
+        index += len(expanded)
 
         # index now identifies the next item to examine.  Continue right now
         # without falling into the index increment below.
@@ -962,15 +1127,18 @@ def QualifyDependencies(targets):
   similar dict.
   """
 
+  all_dependency_sections = [dep + op
+                             for dep in dependency_sections
+                             for op in ('', '!', '/')]
+
   for target, target_dict in targets.iteritems():
     target_build_file = gyp.common.BuildFile(target)
     toolset = target_dict['toolset']
-    for dependency_key in dependency_sections:
+    for dependency_key in all_dependency_sections:
       dependencies = target_dict.get(dependency_key, [])
       for index in xrange(0, len(dependencies)):
         dep_file, dep_target, dep_toolset = gyp.common.ResolveTarget(
             target_build_file, dependencies[index], toolset)
-        global multiple_toolsets
         if not multiple_toolsets:
           # Ignore toolset specification in the dependency if it is specified.
           dep_toolset = toolset
@@ -1056,6 +1224,22 @@ def ExpandWildcardDependencies(targets, data):
         index = index + 1
 
 
+def Unify(l):
+  """Removes duplicate elements from l, keeping the first element."""
+  seen = {}
+  return [seen.setdefault(e, e) for e in l if e not in seen]
+
+
+def RemoveDuplicateDependencies(targets):
+  """Makes sure every dependency appears only once in all targets's dependency
+  lists."""
+  for target_name, target_dict in targets.iteritems():
+    for dependency_key in dependency_sections:
+      dependencies = target_dict.get(dependency_key, [])
+      if dependencies:
+        target_dict[dependency_key] = Unify(dependencies)
+
+
 class DependencyGraphNode(object):
   """
 
@@ -1084,14 +1268,14 @@ class DependencyGraphNode(object):
     # dependencies not in flat_list.  Initially, it is a copy of the children
     # of this node, because when the graph was built, nodes with no
     # dependencies were made implicit dependents of the root node.
-    in_degree_zeros = self.dependents[:]
+    in_degree_zeros = set(self.dependents[:])
 
     while in_degree_zeros:
       # Nodes in in_degree_zeros have no dependencies not in flat_list, so they
       # can be appended to flat_list.  Take these nodes out of in_degree_zeros
       # as work progresses, so that the next node to process from the list can
       # always be accessed at a consistent position.
-      node = in_degree_zeros.pop(0)
+      node = in_degree_zeros.pop()
       flat_list.append(node.ref)
 
       # Look at dependents of the node just added to flat_list.  Some of them
@@ -1111,7 +1295,7 @@ class DependencyGraphNode(object):
           # All of the dependent's dependencies are already in flat_list.  Add
           # it to in_degree_zeros where it will be processed in a future
           # iteration of the outer loop.
-          in_degree_zeros.append(node_dependent)
+          in_degree_zeros.add(node_dependent)
 
     return flat_list
 
@@ -1198,7 +1382,7 @@ class DependencyGraphNode(object):
     setting.
 
     When adding a target to the list of dependencies, this function will
-    recurse into itself with |initial| set to False, to collect depenedencies
+    recurse into itself with |initial| set to False, to collect dependencies
     that are linked into the linkable target for which the list is being built.
     """
     if dependencies == None:
@@ -1230,6 +1414,13 @@ class DependencyGraphNode(object):
       # True) and this target won't be linked.
       return dependencies
 
+    # Don't traverse 'none' targets if explicitly excluded.
+    if (target_type == 'none' and
+        not targets[self.ref].get('dependencies_traverse', True)):
+      if self.ref not in dependencies:
+        dependencies.append(self.ref)
+      return dependencies
+
     # Executables and loadable modules are already fully and finally linked.
     # Nothing else can be a link dependency of them, there can only be
     # dependencies in the sense that a dependent target might run an
@@ -1239,11 +1430,7 @@ class DependencyGraphNode(object):
 
     # The target is linkable, add it to the list of link dependencies.
     if self.ref not in dependencies:
-      if target_type != 'none':
-        # Special case: "none" type targets don't produce any linkable products
-        # and shouldn't be exposed as link dependencies, although dependencies
-        # of "none" type targets may still be link dependencies.
-        dependencies.append(self.ref)
+      dependencies.append(self.ref)
       if initial or not is_linkable:
         # If this is a subsequent target and it's linkable, don't look any
         # further for linkable dependencies, as they'll already be linked into
@@ -1292,9 +1479,61 @@ def BuildDependencyList(targets):
   # targets that are not in flat_list.
   if len(flat_list) != len(targets):
     raise DependencyGraphNode.CircularException, \
-        'Some targets not reachable, cycle in dependency graph detected'
+        'Some targets not reachable, cycle in dependency graph detected: ' + \
+        ' '.join(set(flat_list) ^ set(targets))
 
   return [dependency_nodes, flat_list]
+
+
+def VerifyNoGYPFileCircularDependencies(targets):
+  # Create a DependencyGraphNode for each gyp file containing a target.  Put
+  # it into a dict for easy access.
+  dependency_nodes = {}
+  for target in targets.iterkeys():
+    build_file = gyp.common.BuildFile(target)
+    if not build_file in dependency_nodes:
+      dependency_nodes[build_file] = DependencyGraphNode(build_file)
+
+  # Set up the dependency links.
+  for target, spec in targets.iteritems():
+    build_file = gyp.common.BuildFile(target)
+    build_file_node = dependency_nodes[build_file]
+    target_dependencies = spec.get('dependencies', [])
+    for dependency in target_dependencies:
+      try:
+        dependency_build_file = gyp.common.BuildFile(dependency)
+        if dependency_build_file == build_file:
+          # A .gyp file is allowed to refer back to itself.
+          continue
+        dependency_node = dependency_nodes[dependency_build_file]
+        if dependency_node not in build_file_node.dependencies:
+          build_file_node.dependencies.append(dependency_node)
+          dependency_node.dependents.append(build_file_node)
+      except KeyError, e:
+        gyp.common.ExceptionAppend(
+            e, 'while computing dependencies of .gyp file %s' % build_file)
+        raise
+
+  # Files that have no dependencies are treated as dependent on root_node.
+  root_node = DependencyGraphNode(None)
+  for build_file_node in dependency_nodes.itervalues():
+    if len(build_file_node.dependencies) == 0:
+      build_file_node.dependencies.append(root_node)
+      root_node.dependents.append(build_file_node)
+
+  flat_list = root_node.FlattenToList()
+
+  # If there's anything left unvisited, there must be a circular dependency
+  # (cycle).
+  if len(flat_list) != len(dependency_nodes):
+    bad_files = []
+    for file in dependency_nodes.iterkeys():
+      if not file in flat_list:
+        bad_files.append(file)
+    raise DependencyGraphNode.CircularException, \
+        'Some files not reachable, cycle in .gyp file dependency graph ' + \
+        'detected involving some or all of: ' + \
+        ' '.join(bad_files)
 
 
 def DoDependentSettings(key, flat_list, targets, dependency_nodes):
@@ -1325,7 +1564,8 @@ def DoDependentSettings(key, flat_list, targets, dependency_nodes):
                  build_file, dependency_build_file)
 
 
-def AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes):
+def AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes,
+                                    sort_dependencies):
   # Recompute target "dependencies" properties.  For each static library
   # target, remove "dependencies" entries referring to other static libraries,
   # unless the dependency has the "hard_dependency" attribute set.  For each
@@ -1343,26 +1583,39 @@ def AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes):
       target_dict['dependencies_original'] = target_dict.get(
           'dependencies', [])[:]
 
+      # A static library should not depend on another static library unless
+      # the dependency relationship is "hard," which should only be done when
+      # a dependent relies on some side effect other than just the build
+      # product, like a rule or action output. Further, if a target has a
+      # non-hard dependency, but that dependency exports a hard dependency,
+      # the non-hard dependency can safely be removed, but the exported hard
+      # dependency must be added to the target to keep the same dependency
+      # ordering.
+      dependencies = \
+          dependency_nodes[target].DirectAndImportedDependencies(targets)
       index = 0
-      while index < len(target_dict['dependencies']):
-        dependency = target_dict['dependencies'][index]
+      while index < len(dependencies):
+        dependency = dependencies[index]
         dependency_dict = targets[dependency]
-        if dependency_dict['type'] == 'static_library' and \
-           (not 'hard_dependency' in dependency_dict or \
-            not dependency_dict['hard_dependency']):
-          # A static library should not depend on another static library unless
-          # the dependency relationship is "hard," which should only be done
-          # when a dependent relies on some side effect other than just the
-          # build product, like a rule or action output.  Take the dependency
-          # out of the list, and don't increment index because the next
-          # dependency to analyze will shift into the index formerly occupied
-          # by the one being removed.
-          del target_dict['dependencies'][index]
+
+        # Remove every non-hard static library dependency and remove every
+        # non-static library dependency that isn't a direct dependency.
+        if (dependency_dict['type'] == 'static_library' and \
+            not dependency_dict.get('hard_dependency', False)) or \
+           (dependency_dict['type'] != 'static_library' and \
+            not dependency in target_dict['dependencies']):
+          # Take the dependency out of the list, and don't increment index
+          # because the next dependency to analyze will shift into the index
+          # formerly occupied by the one being removed.
+          del dependencies[index]
         else:
           index = index + 1
 
-      # If the dependencies list is empty, it's not needed, so unhook it.
-      if len(target_dict['dependencies']) == 0:
+      # Update the dependencies. If the dependencies list is empty, it's not
+      # needed, so unhook it.
+      if len(dependencies) > 0:
+        target_dict['dependencies'] = dependencies
+      else:
         del target_dict['dependencies']
 
     elif target_type in linkable_types:
@@ -1378,9 +1631,17 @@ def AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes):
           target_dict['dependencies'] = []
         if not dependency in target_dict['dependencies']:
           target_dict['dependencies'].append(dependency)
+      # Sort the dependencies list in the order from dependents to dependencies.
+      # e.g. If A and B depend on C and C depends on D, sort them in A, B, C, D.
+      # Note: flat_list is already sorted in the order from dependencies to
+      # dependents.
+      if sort_dependencies and 'dependencies' in target_dict:
+        target_dict['dependencies'] = [dep for dep in reversed(flat_list)
+                                       if dep in target_dict['dependencies']]
+
 
 # Initialize this here to speed up MakePathRelative.
-exception_re = re.compile(r'''["']?[-/$<>]''')
+exception_re = re.compile(r'''["']?[-/$<>^]''')
 
 
 def MakePathRelative(to_file, fro_file, item):
@@ -1396,6 +1657,7 @@ def MakePathRelative(to_file, fro_file, item):
   #       "libraries" section)
   #   <   Used for our own variable and command expansions (see ExpandVariables)
   #   >   Used for our own variable and command expansions (see ExpandVariables)
+  #   ^   Used for our own variable and command expansions (see ExpandVariables)
   #
   #   "/' Used when a value is quoted.  If these are present, then we
   #       check the second character instead.
@@ -1406,14 +1668,32 @@ def MakePathRelative(to_file, fro_file, item):
     # TODO(dglazkov) The backslash/forward-slash replacement at the end is a
     # temporary measure. This should really be addressed by keeping all paths
     # in POSIX until actual project generation.
-    return os.path.normpath(os.path.join(
+    ret = os.path.normpath(os.path.join(
         gyp.common.RelativePath(os.path.dirname(fro_file),
                                 os.path.dirname(to_file)),
                                 item)).replace('\\', '/')
-
+    if item[-1] == '/':
+      ret += '/'
+    return ret
 
 def MergeLists(to, fro, to_file, fro_file, is_paths=False, append=True):
+  def is_hashable(x):
+    try:
+      hash(x)
+    except TypeError:
+      return False
+    return True
+  # If x is hashable, returns whether x is in s. Else returns whether x is in l.
+  def is_in_set_or_list(x, s, l):
+    if is_hashable(x):
+      return x in s
+    return x in l
+
   prepend_index = 0
+
+  # Make membership testing of hashables in |to| (in particular, strings)
+  # faster.
+  hashable_to_set = set([x for x in to if is_hashable(x)])
 
   for item in fro:
     singleton = False
@@ -1451,8 +1731,10 @@ def MergeLists(to, fro, to_file, fro_file, is_paths=False, append=True):
     if append:
       # If appending a singleton that's already in the list, don't append.
       # This ensures that the earliest occurrence of the item will stay put.
-      if not singleton or not to_item in to:
+      if not singleton or not is_in_set_or_list(to_item, hashable_to_set, to):
         to.append(to_item)
+        if is_hashable(to_item):
+          hashable_to_set.add(to_item)
     else:
       # If prepending a singleton that's already in the list, remove the
       # existing instance and proceed with the prepend.  This ensures that the
@@ -1464,6 +1746,8 @@ def MergeLists(to, fro, to_file, fro_file, is_paths=False, append=True):
       # items to the list in reverse order, which would be an unwelcome
       # surprise.
       to.insert(prepend_index, to_item)
+      if is_hashable(to_item):
+        hashable_to_set.add(to_item)
       prepend_index = prepend_index + 1
 
 
@@ -1590,7 +1874,6 @@ def MergeConfigWithInheritance(new_configuration_dict, build_file,
 
 
 def SetUpConfigurations(target, target_dict):
-  global non_configuration_keys
   # key_suffixes is a list of key suffixes that might appear on key names.
   # These suffixes are handled in conditional evaluations (for =, +, and ?)
   # and rules/exclude processing (for ! and /).  Keys with these suffixes
@@ -1664,6 +1947,15 @@ def SetUpConfigurations(target, target_dict):
   for key in delete_keys:
     del target_dict[key]
 
+  # Check the configurations to see if they contain invalid keys.
+  for configuration in target_dict['configurations'].keys():
+    configuration_dict = target_dict['configurations'][configuration]
+    for key in configuration_dict.keys():
+      if key in invalid_configuration_keys:
+        raise KeyError, ('%s not allowed in the %s configuration, found in '
+                         'target %s' % (key, configuration, target))
+
+
 
 def ProcessListFiltersInDict(name, the_dict):
   """Process regular expression and exclusion-based filters on lists.
@@ -1676,7 +1968,7 @@ def ProcessListFiltersInDict(name, the_dict):
   Regular expression (regex) filters are contained in dict keys named with a
   trailing "/", such as "sources/" to operate on the "sources" list.  Regex
   filters in a dict take the form:
-    'sources/': [ ['exclude', '_(linux|mac|win)\\.cc$'] ],
+    'sources/': [ ['exclude', '_(linux|mac|win)\\.cc$'],
                   ['include', '_mac\\.cc$'] ],
   The first filter says to exclude all files ending in _linux.cc, _mac.cc, and
   _win.cc.  The second filter then includes all files ending in _mac.cc that
@@ -1760,23 +2052,26 @@ def ProcessListFiltersInDict(name, the_dict):
         [action, pattern] = regex_item
         pattern_re = re.compile(pattern)
 
+        if action == 'exclude':
+          # This item matches an exclude regex, so set its value to 0 (exclude).
+          action_value = 0
+        elif action == 'include':
+          # This item matches an include regex, so set its value to 1 (include).
+          action_value = 1
+        else:
+          # This is an action that doesn't make any sense.
+          raise ValueError, 'Unrecognized action ' + action + ' in ' + name + \
+                            ' key ' + regex_key
+
         for index in xrange(0, len(the_list)):
           list_item = the_list[index]
+          if list_actions[index] == action_value:
+            # Even if the regex matches, nothing will change so continue (regex
+            # searches are expensive).
+            continue
           if pattern_re.search(list_item):
             # Regular expression match.
-
-            if action == 'exclude':
-              # This item matches an exclude regex, so set its value to 0
-              # (exclude).
-              list_actions[index] = 0
-            elif action == 'include':
-              # This item matches an include regex, so set its value to 1
-              # (include).
-              list_actions[index] = 1
-            else:
-              # This is an action that doesn't make any sense.
-              raise ValueError, 'Unrecognized action ' + action + ' in ' + \
-                                name + ' key ' + key
+            list_actions[index] = action_value
 
       # The "whatever/" list is no longer needed, dump it.
       del the_dict[regex_key]
@@ -1825,6 +2120,52 @@ def ProcessListFiltersInList(name, the_list):
       ProcessListFiltersInDict(name, item)
     elif isinstance(item, list):
       ProcessListFiltersInList(name, item)
+
+
+def ValidateTargetType(target, target_dict):
+  """Ensures the 'type' field on the target is one of the known types.
+
+  Arguments:
+    target: string, name of target.
+    target_dict: dict, target spec.
+
+  Raises an exception on error.
+  """
+  VALID_TARGET_TYPES = ('executable', 'loadable_module',
+                        'static_library', 'shared_library',
+                        'none')
+  target_type = target_dict.get('type', None)
+  if target_type not in VALID_TARGET_TYPES:
+    raise Exception("Target %s has an invalid target type '%s'.  "
+                    "Must be one of %s." %
+                    (target, target_type, '/'.join(VALID_TARGET_TYPES)))
+
+
+def ValidateSourcesInTarget(target, target_dict, build_file):
+  # TODO: Check if MSVC allows this for non-static_library targets.
+  if target_dict.get('type', None) != 'static_library':
+    return
+  sources = target_dict.get('sources', [])
+  basenames = {}
+  for source in sources:
+    name, ext = os.path.splitext(source)
+    is_compiled_file = ext in [
+        '.c', '.cc', '.cpp', '.cxx', '.m', '.mm', '.s', '.S']
+    if not is_compiled_file:
+      continue
+    basename = os.path.basename(name)  # Don't include extension.
+    basenames.setdefault(basename, []).append(source)
+
+  error = ''
+  for basename, files in basenames.iteritems():
+    if len(files) > 1:
+      error += '  %s: %s\n' % (basename, ' '.join(files))
+
+  if error:
+    print ('static library %s has several files with the same basename:\n' %
+           target + error + 'Some build systems, e.g. MSVC08, '
+           'cannot handle that.')
+    raise KeyError, 'Duplicate basenames in sources section, see list above'
 
 
 def ValidateRulesInTarget(target, target_dict, extra_sources_for_rules):
@@ -1884,19 +2225,6 @@ def ValidateRulesInTarget(target, target_dict, extra_sources_for_rules):
       rule['rule_sources'] = rule_sources
 
 
-def ValidateActionsInTarget(target, target_dict, build_file):
-  '''Validates the inputs to the actions in a target.'''
-  target_name = target_dict.get('target_name')
-  actions = target_dict.get('actions', [])
-  for action in actions:
-    action_name = action.get('action_name')
-    if not action_name:
-      raise Exception("Anonymous action in target %s.  "
-                      "An action must have an 'action_name' field." %
-                      target_name)
-    inputs = action.get('inputs', [])
-
-
 def ValidateRunAsInTarget(target, target_dict, build_file):
   target_name = target_dict.get('target_name')
   run_as = target_dict.get('run_as')
@@ -1925,6 +2253,24 @@ def ValidateRunAsInTarget(target, target_dict, build_file):
     raise Exception("The 'environment' for 'run_as' in target %s "
                     "in file %s should be a dictionary." %
                     (target_name, build_file))
+
+
+def ValidateActionsInTarget(target, target_dict, build_file):
+  '''Validates the inputs to the actions in a target.'''
+  target_name = target_dict.get('target_name')
+  actions = target_dict.get('actions', [])
+  for action in actions:
+    action_name = action.get('action_name')
+    if not action_name:
+      raise Exception("Anonymous action in target %s.  "
+                      "An action must have an 'action_name' field." %
+                      target_name)
+    inputs = action.get('inputs', None)
+    if inputs is None:
+      raise Exception('Action in target %s has no inputs.' % target_name)
+    action_command = action.get('action')
+    if action_command and not action_command[0]:
+      raise Exception("Empty action as command in target %s." % target_name)
 
 
 def TurnIntIntoStrInDict(the_dict):
@@ -1959,7 +2305,35 @@ def TurnIntIntoStrInList(the_list):
       TurnIntIntoStrInList(item)
 
 
-def Load(build_files, variables, includes, depth, generator_input_info, check):
+def VerifyNoCollidingTargets(targets):
+  """Verify that no two targets in the same directory share the same name.
+
+  Arguments:
+    targets: A list of targets in the form 'path/to/file.gyp:target_name'.
+  """
+  # Keep a dict going from 'subdirectory:target_name' to 'foo.gyp'.
+  used = {}
+  for target in targets:
+    # Separate out 'path/to/file.gyp, 'target_name' from
+    # 'path/to/file.gyp:target_name'.
+    path, name = target.rsplit(':', 1)
+    # Separate out 'path/to', 'file.gyp' from 'path/to/file.gyp'.
+    subdir, gyp = os.path.split(path)
+    # Use '.' for the current directory '', so that the error messages make
+    # more sense.
+    if not subdir:
+      subdir = '.'
+    # Prepare a key like 'path/to:target_name'.
+    key = subdir + ':' + name
+    if key in used:
+      # Complain if this target is already used.
+      raise Exception('Duplicate target name "%s" in directory "%s" used both '
+                      'in "%s" and "%s".' % (name, subdir, gyp, used[key]))
+    used[key] = gyp
+
+
+def Load(build_files, variables, includes, depth, generator_input_info, check,
+         circular_check):
   # Set up path_sections and non_configuration_keys with the default data plus
   # the generator-specifc data.
   global path_sections
@@ -2015,7 +2389,32 @@ def Load(build_files, variables, includes, depth, generator_input_info, check):
   # Expand dependencies specified as build_file:*.
   ExpandWildcardDependencies(targets, data)
 
+  # Apply exclude (!) and regex (/) list filters only for dependency_sections.
+  for target_name, target_dict in targets.iteritems():
+    tmp_dict = {}
+    for key_base in dependency_sections:
+      for op in ('', '!', '/'):
+        key = key_base + op
+        if key in target_dict:
+          tmp_dict[key] = target_dict[key]
+          del target_dict[key]
+    ProcessListFiltersInDict(target_name, tmp_dict)
+    # Write the results back to |target_dict|.
+    for key in tmp_dict:
+      target_dict[key] = tmp_dict[key]
+
+  # Make sure every dependency appears at most once.
+  RemoveDuplicateDependencies(targets)
+
+  if circular_check:
+    # Make sure that any targets in a.gyp don't contain dependencies in other
+    # .gyp files that further depend on a.gyp.
+    VerifyNoGYPFileCircularDependencies(targets)
+
   [dependency_nodes, flat_list] = BuildDependencyList(targets)
+
+  # Check that no two targets in the same directory have the same name.
+  VerifyNoCollidingTargets(flat_list)
 
   # Handle dependent settings of various types.
   for settings_type in ['all_dependent_settings',
@@ -2032,14 +2431,17 @@ def Load(build_files, variables, includes, depth, generator_input_info, check):
   # Make sure static libraries don't declare dependencies on other static
   # libraries, but that linkables depend on all unlinked static libraries
   # that they need so that their link steps will be correct.
-  AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes)
+  gii = generator_input_info
+  if gii['generator_wants_static_library_dependencies_adjusted']:
+    AdjustStaticLibraryDependencies(flat_list, targets, dependency_nodes,
+                                    gii['generator_wants_sorted_dependencies'])
 
   # Apply "post"/"late"/"target" variable expansions and condition evaluations.
   for target in flat_list:
     target_dict = targets[target]
     build_file = gyp.common.BuildFile(target)
-    ProcessVariablesAndConditionsInDict(target_dict, True, variables,
-                                        build_file)
+    ProcessVariablesAndConditionsInDict(
+        target_dict, PHASE_LATE, variables, build_file)
 
   # Move everything that can go into a "configurations" section into one.
   for target in flat_list:
@@ -2051,6 +2453,13 @@ def Load(build_files, variables, includes, depth, generator_input_info, check):
     target_dict = targets[target]
     ProcessListFiltersInDict(target, target_dict)
 
+  # Apply "latelate" variable expansions and condition evaluations.
+  for target in flat_list:
+    target_dict = targets[target]
+    build_file = gyp.common.BuildFile(target)
+    ProcessVariablesAndConditionsInDict(
+        target_dict, PHASE_LATELATE, variables, build_file)
+
   # Make sure that the rules make sense, and build up rule_sources lists as
   # needed.  Not all generators will need to use the rule_sources lists, but
   # some may, and it seems best to build the list in a common spot.
@@ -2058,6 +2467,11 @@ def Load(build_files, variables, includes, depth, generator_input_info, check):
   for target in flat_list:
     target_dict = targets[target]
     build_file = gyp.common.BuildFile(target)
+    ValidateTargetType(target, target_dict)
+    # TODO(thakis): Get vpx_scale/arm/scalesystemdependent.c to be renamed to
+    #               scalesystemdependent_arm_additions.c or similar.
+    if 'arm' not in variables.get('target_arch', ''):
+      ValidateSourcesInTarget(target, target_dict, build_file)
     ValidateRulesInTarget(target, target_dict, extra_sources_for_rules)
     ValidateRunAsInTarget(target, target_dict, build_file)
     ValidateActionsInTarget(target, target_dict, build_file)

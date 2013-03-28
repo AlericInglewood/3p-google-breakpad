@@ -198,7 +198,7 @@ version.
     TestCmd.where_is('foo', 'PATH1;PATH2', '.suffix3;.suffix4')
 """
 
-# Copyright 2000, 2001, 2002, 2003, 2004 Steven Knight
+# Copyright 2000-2010 Steven Knight
 # This module is free software, and you may redistribute it and/or modify
 # it under the same terms as Python itself, so long as this copyright message
 # and disclaimer are retained in their original form.
@@ -215,8 +215,8 @@ version.
 # SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steven Knight <knight at baldmt dot com>"
-__revision__ = "TestCmd.py 0.36.D001 2009/07/24 08:45:26 knight"
-__version__ = "0.36"
+__revision__ = "TestCmd.py 0.37.D001 2010/01/11 16:55:50 knight"
+__version__ = "0.37"
 
 import errno
 import os
@@ -384,8 +384,11 @@ def no_result(self = None, condition = 1, function = None, skip = 0):
             desc = " [" + self.description + "]"
             sep = "\n\t"
 
-    at = _caller(traceback.extract_stack(), skip)
-    sys.stderr.write("NO RESULT for test" + of + desc + sep + at)
+    if os.environ.get('TESTCMD_DEBUG_SKIPS'):
+        at = _caller(traceback.extract_stack(), skip)
+        sys.stderr.write("NO RESULT for test" + of + desc + sep + at)
+    else:
+        sys.stderr.write("NO RESULT\n")
 
     sys.exit(2)
 
@@ -828,6 +831,14 @@ def send_all(p, data):
 
 
 
+try:
+    object
+except NameError:
+    class object:
+        pass
+
+
+
 class TestCmd(object):
     """Class TestCmd
     """
@@ -854,11 +865,11 @@ class TestCmd(object):
         self.verbose_set(verbose)
         self.combine = combine
         self.universal_newlines = universal_newlines
-        if not match is None:
+        if match is not None:
             self.match_function = match
         else:
             self.match_function = match_re
-        if not diff is None:
+        if diff is not None:
             self.diff_function = diff
         else:
             try:
@@ -1116,7 +1127,9 @@ class TestCmd(object):
         file = self.canonicalize(file)
         if mode[0] != 'r':
             raise ValueError, "mode must begin with 'r'"
-        return open(file, mode).read()
+        with open(file, mode) as f:
+            result = f.read()
+        return result
 
     def rmdir(self, dir):
         """Removes the specified dir name.
@@ -1147,6 +1160,14 @@ class TestCmd(object):
         if universal_newlines is None:
             universal_newlines = self.universal_newlines
 
+        # On Windows, if we make stdin a pipe when we plan to send 
+        # no input, and the test program exits before
+        # Popen calls msvcrt.open_osfhandle, that call will fail.
+        # So don't use a pipe for stdin if we don't need one.
+        stdin = kw.get('stdin', None)
+        if stdin is not None:
+            stdin = subprocess.PIPE
+
         combine = kw.get('combine', self.combine)
         if combine:
             stderr_value = subprocess.STDOUT
@@ -1154,7 +1175,7 @@ class TestCmd(object):
             stderr_value = subprocess.PIPE
 
         return Popen(cmd,
-                     stdin=subprocess.PIPE,
+                     stdin=stdin,
                      stdout=subprocess.PIPE,
                      stderr=stderr_value,
                      universal_newlines=universal_newlines)
@@ -1196,14 +1217,18 @@ class TestCmd(object):
             if self.verbose:
                 sys.stderr.write("chdir(" + chdir + ")\n")
             os.chdir(chdir)
-        p = self.start(program, interpreter, arguments, universal_newlines)
+        p = self.start(program,
+                       interpreter,
+                       arguments,
+                       universal_newlines,
+                       stdin=stdin)
         if stdin:
             if is_List(stdin):
                 for line in stdin:
                     p.stdin.write(line)
             else:
                 p.stdin.write(stdin)
-        p.stdin.close()
+            p.stdin.close()
 
         out = p.stdout.read()
         if p.stderr is None:
@@ -1562,7 +1587,8 @@ class TestCmd(object):
         file = self.canonicalize(file)
         if mode[0] != 'w':
             raise ValueError, "mode must begin with 'w'"
-        open(file, mode).write(content)
+        with open(file, mode) as f:
+            f.write(content)
 
 # Local Variables:
 # tab-width:4

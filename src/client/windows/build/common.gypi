@@ -191,10 +191,6 @@
     # Currently ignored on Windows.
     'coverage%': 0,
 
-    # Overridable specification for potential use of alternative
-    # JavaScript engines.
-    'javascript_engine%': 'v8',
-
     # Although base/allocator lets you select a heap library via an
     # environment variable, the libcmt shim it uses sometimes gets in
     # the way.  To disable it entirely, and switch to normal msvcrt, do e.g.
@@ -272,7 +268,7 @@
 
     # Enable new NPDevice API.
     'enable_new_npdevice_api%': 0,
-    
+
     'conditions': [
       ['OS=="linux" or OS=="freebsd" or OS=="openbsd"', {
         # This will set gcc_version to XY if you are running gcc X.Y.*.
@@ -404,10 +400,8 @@
       'win_release_Optimization%': '2', # 2 = /Os
       'win_debug_Optimization%': '0',   # 0 = /Od
       # See http://msdn.microsoft.com/en-us/library/aa652367(VS.71).aspx
-      #'win_release_RuntimeLibrary%': '0', # 0 = /MT (nondebug static)
-      #'win_debug_RuntimeLibrary%': '1',   # 1 = /MTd (debug static)
-      'win_release_RuntimeLibrary%': '2', # 2 = /MD (nondebug dll)
-      'win_debug_RuntimeLibrary%': '3',   # 3 = /MDd (debug dll)
+      'win_release_RuntimeLibrary%': '0', # 0 = /MT (nondebug static)
+      'win_debug_RuntimeLibrary%': '1',   # 1 = /MTd (debug static)
 
       'release_extra_cflags%': '',
       'debug_extra_cflags%': '',
@@ -517,7 +511,6 @@
               '_CRT_SECURE_NO_DEPRECATE',
               '_CRT_NONSTDC_NO_WARNINGS',
               '_CRT_NONSTDC_NO_DEPRECATE',
-              '_SCL_SECURE_NO_DEPRECATE',
             ],
             'msvs_disabled_warnings': [4800],
             'msvs_settings': {
@@ -1200,7 +1193,6 @@
             'WarningLevel': '3',
             'WarnAsError': 'true',
             'DebugInformationFormat': '3',
-            'TreatWChar_tAsBuiltInType': 'false',
             'conditions': [
               [ 'msvs_multi_core_compile', {
                 'AdditionalOptions': ['/MP'],

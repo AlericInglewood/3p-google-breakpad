@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright (c) 2009 Google Inc. All rights reserved.
+# Copyright (c) 2012 Google Inc. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -36,15 +34,23 @@ class TargetBase(object):
     """
     Returns the full name of the product being built:
 
-      * Uses 'product_name' if it's set, else 'target_name'.
-      * Appends SCons prefix and suffix variables for the target type.
+      * Uses 'product_name' if it's set, else prefix + 'target_name'.
       * Prepends 'product_dir' if set.
+      * Appends SCons suffix variables for the target type (or
+        product_extension).
     """
-    name = self.spec.get('product_name') or self.spec['target_name']
-    name = self.target_prefix + name + self.target_suffix
+    suffix = self.target_suffix
+    product_extension = self.spec.get('product_extension')
+    if product_extension:
+      suffix = '.' + product_extension
+    prefix = self.spec.get('product_prefix', self.target_prefix)
+    name = self.spec['target_name']
+    name = prefix + self.spec.get('product_name', name) + suffix
     product_dir = self.spec.get('product_dir')
     if product_dir:
       name = os.path.join(product_dir, name)
+    else:
+      name = os.path.join(self.out_dir, name)
     return name
 
   def write_input_files(self, fp):
@@ -64,7 +70,7 @@ class TargetBase(object):
     Returns the actual SCons builder call to build this target.
     """
     name = self.full_product_name()
-    return 'env.%s(%r, input_files)' % (self.builder_name, name)
+    return 'env.%s(env.File(%r), input_files)' % (self.builder_name, name)
   def write_target(self, fp, src_dir='', pre=''):
     """
     Writes the lines necessary to build this target.
@@ -78,7 +84,7 @@ class NoneTarget(TargetBase):
   """
   A GYP target type of 'none', implicitly or explicitly.
   """
-  def write_target(self, fp, pre=''):
+  def write_target(self, fp, src_dir='', pre=''):
     fp.write('\ntarget_files.extend(input_files)\n')
 
 
@@ -142,14 +148,7 @@ class ProgramTarget(CompilableSourcesTargetBase):
   intermediate_builder_name = 'StaticObject'
   target_prefix = '${PROGPREFIX}'
   target_suffix = '${PROGSUFFIX}'
-
-  # TODO:  remove these subclass methods by moving the env.File()
-  # into the base class.
-  def write_target(self, fp, src_dir='', pre=''):
-    fp.write('\n_program = env.File(%r)' % self.full_product_name())
-    super(ProgramTarget, self).write_target(fp, src_dir, pre)
-  def builder_call(self):
-    return 'env.GypProgram(_program, input_files)'
+  out_dir = '${TOP_BUILDDIR}'
 
 
 class StaticLibraryTarget(CompilableSourcesTargetBase):
@@ -158,9 +157,9 @@ class StaticLibraryTarget(CompilableSourcesTargetBase):
   """
   builder_name = 'GypStaticLibrary'
   intermediate_builder_name = 'StaticObject'
-  # TODO:  enable these
-  #target_prefix = '${LIBPREFIX}'
-  #target_suffix = '${LIBSUFFIX}'
+  target_prefix = '${LIBPREFIX}'
+  target_suffix = '${LIBSUFFIX}'
+  out_dir = '${LIB_DIR}'
 
 
 class SharedLibraryTarget(CompilableSourcesTargetBase):
@@ -169,9 +168,9 @@ class SharedLibraryTarget(CompilableSourcesTargetBase):
   """
   builder_name = 'GypSharedLibrary'
   intermediate_builder_name = 'SharedObject'
-  # TODO:  enable these
-  #target_prefix = '${SHLIBPREFIX}'
-  #target_suffix = '${SHLIBSUFFIX}'
+  target_prefix = '${SHLIBPREFIX}'
+  target_suffix = '${SHLIBSUFFIX}'
+  out_dir = '${LIB_DIR}'
 
 
 class LoadableModuleTarget(CompilableSourcesTargetBase):
@@ -180,9 +179,9 @@ class LoadableModuleTarget(CompilableSourcesTargetBase):
   """
   builder_name = 'GypLoadableModule'
   intermediate_builder_name = 'SharedObject'
-  # TODO:  enable these
-  #target_prefix = '${SHLIBPREFIX}'
-  #target_suffix = '${SHLIBSUFFIX}'
+  target_prefix = '${SHLIBPREFIX}'
+  target_suffix = '${SHLIBSUFFIX}'
+  out_dir = '${TOP_BUILDDIR}'
 
 
 TargetMap = {
@@ -194,6 +193,7 @@ TargetMap = {
   'shared_library' : SharedLibraryTarget,
   'loadable_module' : LoadableModuleTarget,
 }
+
 
 def Target(spec):
   return TargetMap[spec.get('type')](spec)

@@ -38,16 +38,18 @@
 #ifndef COMMON_LINUX_MODULE_H__
 #define COMMON_LINUX_MODULE_H__
 
+#include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-#include <cstdio>
 
+#include "common/using_std_string.h"
 #include "google_breakpad/common/breakpad_types.h"
 
 namespace google_breakpad {
 
-using std::string;
+using std::set;
 using std::vector;
 using std::map;
 
@@ -62,6 +64,7 @@ class Module {
   struct File;
   struct Function;
   struct Line;
+  struct Extern;
 
   // Addresses appearing in File, Function, and Line structures are
   // absolute, not relative to the the module's load address.  That
@@ -89,7 +92,7 @@ class Module {
 
     // The function's name.
     string name;
-    
+
     // The start address and length of the function's code.
     Address address, size;
 
@@ -114,6 +117,12 @@ class Module {
     int number;                // The source line number.
   };
 
+  // An exported symbol.
+  struct Extern {
+    Address address;
+    string name;
+  };
+
   // A map from register names to postfix expressions that recover
   // their their values. This can represent a complete set of rules to
   // follow at some address, or a set of changes to be applied to an
@@ -123,7 +132,7 @@ class Module {
   // A map from addresses to RuleMaps, representing changes that take
   // effect at given addresses.
   typedef map<Address, RuleMap> RuleChangeMap;
-  
+
   // A range of 'STACK CFI' stack walking information. An instance of
   // this structure corresponds to a 'STACK CFI INIT' record and the
   // subsequent 'STACK CFI' records that fall within its range.
@@ -142,10 +151,26 @@ class Module {
     // including the address you're interested in.
     RuleChangeMap rule_changes;
   };
-    
+
+  struct FunctionCompare {
+    bool operator() (const Function *lhs,
+                     const Function *rhs) const {
+      if (lhs->address == rhs->address)
+        return lhs->name < rhs->name;
+      return lhs->address < rhs->address;
+    }
+  };
+
+  struct ExternCompare {
+    bool operator() (const Extern *lhs,
+                     const Extern *rhs) const {
+      return lhs->address < rhs->address;
+    }
+  };
+
   // Create a new module with the given name, operating system,
   // architecture, and ID string.
-  Module(const string &name, const string &os, const string &architecture, 
+  Module(const string &name, const string &os, const string &architecture,
          const string &id);
   ~Module();
 
@@ -163,7 +188,7 @@ class Module {
   // Write is used.
   void SetLoadAddress(Address load_address);
 
-  // Add FUNCTION to the module.
+  // Add FUNCTION to the module. FUNCTION's name must not be empty.
   // This module owns all Function objects added with this function:
   // destroying the module destroys them as well.
   void AddFunction(Function *function);
@@ -175,10 +200,14 @@ class Module {
                     vector<Function *>::iterator end);
 
   // Add STACK_FRAME_ENTRY to the module.
-  // 
   // This module owns all StackFrameEntry objects added with this
   // function: destroying the module destroys them as well.
   void AddStackFrameEntry(StackFrameEntry *stack_frame_entry);
+
+  // Add PUBLIC to the module.
+  // This module owns all Extern objects added with this function:
+  // destroying the module destroys them as well.
+  void AddExtern(Extern *ext);
 
   // If this module has a file named NAME, return a pointer to it. If
   // it has none, then create one and return a pointer to the new
@@ -197,6 +226,13 @@ class Module {
   // mostly useful for testing; other uses should probably get a more
   // appropriate interface.)
   void GetFunctions(vector<Function *> *vec, vector<Function *>::iterator i);
+
+  // Insert pointers to the externs added to this module at I in
+  // VEC. The pointed-to Externs are still owned by this module.
+  // (Since this is effectively a copy of the extern list, this is
+  // mostly useful for testing; other uses should probably get a more
+  // appropriate interface.)
+  void GetExterns(vector<Extern *> *vec, vector<Extern *>::iterator i);
 
   // Clear VEC and fill it with pointers to the Files added to this
   // module, sorted by name. The pointed-to Files are still owned by
@@ -223,14 +259,15 @@ class Module {
   // breakpad symbol format. Return true if all goes well, or false if
   // an error occurs. This method writes out:
   // - a header based on the values given to the constructor,
-  // - the source files added via FindFile, and finally
-  // - the functions added via AddFunctions, each with its lines.
+  // - the source files added via FindFile,
+  // - the functions added via AddFunctions, each with its lines,
+  // - all public records,
+  // - and if CFI is true, all CFI records.
   // Addresses in the output are all relative to the load address
   // established by SetLoadAddress.
-  bool Write(FILE *stream);
+  bool Write(std::ostream &stream, bool cfi);
 
  private:
-
   // Report an error that has occurred writing the symbol file, using
   // errno to find the appropriate cause.  Return false.
   static bool ReportError();
@@ -238,7 +275,7 @@ class Module {
   // Write RULE_MAP to STREAM, in the form appropriate for 'STACK CFI'
   // records, without a final newline. Return true if all goes well;
   // if an error occurs, return false, and leave errno set.
-  static bool WriteRuleMap(const RuleMap &rule_map, FILE *stream);
+  static bool WriteRuleMap(const RuleMap &rule_map, std::ostream &stream);
 
   // Module header entries.
   string name_, os_, architecture_, id_;
@@ -251,24 +288,34 @@ class Module {
   // Relation for maps whose keys are strings shared with some other
   // structure.
   struct CompareStringPtrs {
-    bool operator()(const string *x, const string *y) { return *x < *y; };
+    bool operator()(const string *x, const string *y) { return *x < *y; }
   };
 
   // A map from filenames to File structures.  The map's keys are
   // pointers to the Files' names.
   typedef map<const string *, File *, CompareStringPtrs> FileByNameMap;
 
+  // A set containing Function structures, sorted by address.
+  typedef set<Function *, FunctionCompare> FunctionSet;
+
+  // A set containing Extern structures, sorted by address.
+  typedef set<Extern *, ExternCompare> ExternSet;
+
   // The module owns all the files and functions that have been added
   // to it; destroying the module frees the Files and Functions these
   // point to.
-  FileByNameMap files_;                 // This module's source files.  
-  vector<Function *> functions_;        // This module's functions.
+  FileByNameMap files_;    // This module's source files.
+  FunctionSet functions_;  // This module's functions.
 
   // The module owns all the call frame info entries that have been
   // added to it.
   vector<StackFrameEntry *> stack_frame_entries_;
+
+  // The module owns all the externs that have been added to it;
+  // destroying the module frees the Externs these point to.
+  ExternSet externs_;
 };
 
-} // namespace google_breakpad
+}  // namespace google_breakpad
 
 #endif  // COMMON_LINUX_MODULE_H__

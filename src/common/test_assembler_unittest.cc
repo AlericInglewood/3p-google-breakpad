@@ -36,12 +36,12 @@
 
 #include "breakpad_googletest_includes.h"
 #include "common/test_assembler.h"
+#include "common/using_std_string.h"
 
-using google_breakpad::TestAssembler::Label;
-using google_breakpad::TestAssembler::Section;
-using google_breakpad::TestAssembler::kBigEndian;
-using google_breakpad::TestAssembler::kLittleEndian;
-using std::string;
+using google_breakpad::test_assembler::Label;
+using google_breakpad::test_assembler::Section;
+using google_breakpad::test_assembler::kBigEndian;
+using google_breakpad::test_assembler::kLittleEndian;
 using testing::Test;
 
 TEST(ConstructLabel, Simple) {

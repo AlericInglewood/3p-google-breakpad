@@ -30,25 +30,28 @@
 
 #include "common/linux/google_crashdump_uploader.h"
 #include "common/linux/libcurl_wrapper.h"
-#include "third_party/linux/include/glog/logging.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <iostream>
+
+#include "common/using_std_string.h"
+
 namespace google_breakpad {
 
-GoogleCrashdumpUploader::GoogleCrashdumpUploader(const std::string& product,
-                                                 const std::string& version,
-                                                 const std::string& guid,
-                                                 const std::string& ptime,
-                                                 const std::string& ctime,
-                                                 const std::string& email,
-                                                 const std::string& comments,
-                                                 const std::string& minidump_pathname,
-                                                 const std::string& crash_server,
-                                                 const std::string& proxy_host,
-                                                 const std::string& proxy_userpassword) {
+GoogleCrashdumpUploader::GoogleCrashdumpUploader(const string& product,
+                                                 const string& version,
+                                                 const string& guid,
+                                                 const string& ptime,
+                                                 const string& ctime,
+                                                 const string& email,
+                                                 const string& comments,
+                                                 const string& minidump_pathname,
+                                                 const string& crash_server,
+                                                 const string& proxy_host,
+                                                 const string& proxy_userpassword) {
   LibcurlWrapper* http_layer = new LibcurlWrapper();
   Init(product,
        version,
@@ -64,17 +67,17 @@ GoogleCrashdumpUploader::GoogleCrashdumpUploader(const std::string& product,
        http_layer);
 }
 
-GoogleCrashdumpUploader::GoogleCrashdumpUploader(const std::string& product,
-                                                 const std::string& version,
-                                                 const std::string& guid,
-                                                 const std::string& ptime,
-                                                 const std::string& ctime,
-                                                 const std::string& email,
-                                                 const std::string& comments,
-                                                 const std::string& minidump_pathname,
-                                                 const std::string& crash_server,
-                                                 const std::string& proxy_host,
-                                                 const std::string& proxy_userpassword,
+GoogleCrashdumpUploader::GoogleCrashdumpUploader(const string& product,
+                                                 const string& version,
+                                                 const string& guid,
+                                                 const string& ptime,
+                                                 const string& ctime,
+                                                 const string& email,
+                                                 const string& comments,
+                                                 const string& minidump_pathname,
+                                                 const string& crash_server,
+                                                 const string& proxy_host,
+                                                 const string& proxy_userpassword,
                                                  LibcurlWrapper* http_layer) {
   Init(product,
        version,
@@ -90,17 +93,17 @@ GoogleCrashdumpUploader::GoogleCrashdumpUploader(const std::string& product,
        http_layer);
 }
 
-void GoogleCrashdumpUploader::Init(const std::string& product,
-                                   const std::string& version,
-                                   const std::string& guid,
-                                   const std::string& ptime,
-                                   const std::string& ctime,
-                                   const std::string& email,
-                                   const std::string& comments,
-                                   const std::string& minidump_pathname,
-                                   const std::string& crash_server,
-                                   const std::string& proxy_host,
-                                   const std::string& proxy_userpassword,
+void GoogleCrashdumpUploader::Init(const string& product,
+                                   const string& version,
+                                   const string& guid,
+                                   const string& ptime,
+                                   const string& ctime,
+                                   const string& email,
+                                   const string& comments,
+                                   const string& minidump_pathname,
+                                   const string& crash_server,
+                                   const string& proxy_host,
+                                   const string& proxy_userpassword,
                                    LibcurlWrapper* http_layer) {
   product_ = product;
   version_ = version;
@@ -115,26 +118,26 @@ void GoogleCrashdumpUploader::Init(const std::string& product,
   proxy_host_ = proxy_host;
   proxy_userpassword_ = proxy_userpassword;
   minidump_pathname_ = minidump_pathname;
-  LOG(INFO) << "Uploader initializing";
-  LOG(INFO) << "\tProduct: " << product_;
-  LOG(INFO) << "\tVersion: " << version_;
-  LOG(INFO) << "\tGUID: " << guid_;
+  std::cout << "Uploader initializing";
+  std::cout << "\tProduct: " << product_;
+  std::cout << "\tVersion: " << version_;
+  std::cout << "\tGUID: " << guid_;
   if (!ptime_.empty()) {
-    LOG(INFO) << "\tProcess uptime: " << ptime_;
+    std::cout << "\tProcess uptime: " << ptime_;
   }
   if (!ctime_.empty()) {
-    LOG(INFO) << "\tCumulative Process uptime: " << ctime_;
+    std::cout << "\tCumulative Process uptime: " << ctime_;
   }
   if (!email_.empty()) {
-    LOG(INFO) << "\tEmail: " << email_;
+    std::cout << "\tEmail: " << email_;
   }
   if (!comments_.empty()) {
-    LOG(INFO) << "\tComments: " << comments_;
+    std::cout << "\tComments: " << comments_;
   }
 }
 
 bool GoogleCrashdumpUploader::CheckRequiredParametersArePresent() {
-  std::string error_text;
+  string error_text;
   if (product_.empty()) {
     error_text.append("\nProduct name must be specified.");
   }
@@ -152,7 +155,7 @@ bool GoogleCrashdumpUploader::CheckRequiredParametersArePresent() {
   }
 
   if (!error_text.empty()) {
-    LOG(ERROR) << error_text;
+    std::cout << error_text;
     return false;
   }
   return true;
@@ -162,7 +165,7 @@ bool GoogleCrashdumpUploader::CheckRequiredParametersArePresent() {
 bool GoogleCrashdumpUploader::Upload() {
   bool ok = http_layer_->Init();
   if (!ok) {
-    LOG(WARNING) << "http layer init failed";
+    std::cout << "http layer init failed";
     return ok;
   }
 
@@ -173,7 +176,7 @@ bool GoogleCrashdumpUploader::Upload() {
   struct stat st;
   int err = stat(minidump_pathname_.c_str(), &st);
   if (err) {
-    LOG(WARNING) << minidump_pathname_ << " could not be found: " << errno;
+    std::cout << minidump_pathname_ << " could not be found";
     return false;
   }
 
@@ -188,7 +191,7 @@ bool GoogleCrashdumpUploader::Upload() {
                             "upload_file_minidump")) {
     return false;
   }
-  LOG(INFO) << "Sending request to " << crash_server_;
+  std::cout << "Sending request to " << crash_server_;
   return http_layer_->SendRequest(crash_server_,
                                   parameters_,
                                   NULL);

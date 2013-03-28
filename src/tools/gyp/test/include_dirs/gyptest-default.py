@@ -12,6 +12,9 @@ import TestGyp
 
 test = TestGyp.TestGyp()
 
+if test.format == 'scons':
+  test.skip_test('TODO: http://code.google.com/p/gyp/issues/detail?id=176\n')
+
 test.run_gyp('includes.gyp', chdir='src')
 
 test.relocate('src', 'relocate/src')
@@ -23,6 +26,7 @@ Hello from includes.c
 Hello from inc.h
 Hello from include1.h
 Hello from subdir/inc2/include2.h
+Hello from shadow2/shadow.h
 """
 test.run_built_executable('includes', stdout=expect, chdir='relocate/src')
 

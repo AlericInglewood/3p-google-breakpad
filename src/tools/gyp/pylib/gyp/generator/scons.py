@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-# Copyright (c) 2009 Google Inc. All rights reserved.
+# Copyright (c) 2012 Google Inc. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -30,6 +28,7 @@ generator_default_variables = {
     'SHARED_LIB_DIR': '$LIB_DIR',
     'LIB_DIR': '$LIB_DIR',
     'RULE_INPUT_ROOT': '${SOURCE.filebase}',
+    'RULE_INPUT_DIRNAME': '${SOURCE.dir}',
     'RULE_INPUT_EXT': '${SOURCE.suffix}',
     'RULE_INPUT_NAME': '${SOURCE.file}',
     'RULE_INPUT_PATH': '${SOURCE.abspath}',
@@ -166,9 +165,39 @@ def gyp_spawn(sh, escape, cmd, args, env):
     return SCons.Platform.posix.exec_spawnvpe(stripped_args, env)
 """
 
-escape_quotes_re = re.compile('^([^=]*=)"([^"]*)"$')
-def escape_quotes(s):
-    return escape_quotes_re.sub('\\1\\"\\2\\"', s)
+
+def EscapeShellArgument(s):
+  """Quotes an argument so that it will be interpreted literally by a POSIX
+     shell. Taken from
+     http://stackoverflow.com/questions/35817/whats-the-best-way-to-escape-ossystem-calls-in-python
+     """
+  return "'" + s.replace("'", "'\\''") + "'"
+
+
+def InvertNaiveSConsQuoting(s):
+  """SCons tries to "help" with quoting by naively putting double-quotes around
+     command-line arguments containing space or tab, which is broken for all
+     but trivial cases, so we undo it. (See quote_spaces() in Subst.py)"""
+  if ' ' in s or '\t' in s:
+    # Then SCons will put double-quotes around this, so add our own quotes
+    # to close its quotes at the beginning and end.
+    s = '"' + s + '"'
+  return s
+
+
+def EscapeSConsVariableExpansion(s):
+  """SCons has its own variable expansion syntax using $. We must escape it for
+    strings to be interpreted literally. For some reason this requires four
+    dollar signs, not two, even without the shell involved."""
+  return s.replace('$', '$$$$')
+
+
+def EscapeCppDefine(s):
+  """Escapes a CPP define so that it will reach the compiler unaltered."""
+  s = EscapeShellArgument(s)
+  s = InvertNaiveSConsQuoting(s)
+  s = EscapeSConsVariableExpansion(s)
+  return s
 
 
 def GenerateConfig(fp, config, indent='', src_dir=''):
@@ -197,7 +226,7 @@ def GenerateConfig(fp, config, indent='', src_dir=''):
       value = config.get(gyp_var)
       if value:
         if gyp_var in ('defines',):
-          value = [escape_quotes(v) for v in value]
+          value = [EscapeCppDefine(v) for v in value]
         if gyp_var in ('include_dirs',):
           if src_dir and not src_dir.endswith('/'):
             src_dir += '/'
@@ -433,8 +462,7 @@ def GenerateSConscript(output_filename, spec, build_file, build_file_data):
 
   rules = spec.get('rules', [])
   for rule in rules:
-    name = rule['rule_name']
-    a = ['cd', src_subdir, '&&'] + rule['action']
+    name = re.sub('[^a-zA-Z0-9_]', '_', rule['rule_name'])
     message = rule.get('message')
     if message:
         message = repr(message)
@@ -444,6 +472,10 @@ def GenerateSConscript(output_filename, spec, build_file, build_file_data):
       poas_line = '_processed_input_files.append(infile)'
     inputs = [FixPath(f, src_subdir_) for f in rule.get('inputs', [])]
     outputs = [FixPath(f, src_subdir_) for f in rule.get('outputs', [])]
+    # Skip a rule with no action and no inputs.
+    if 'action' not in rule and not rule.get('rule_sources', []):
+      continue
+    a = ['cd', src_subdir, '&&'] + rule['action']
     fp.write(_rule_template % {
                  'inputs' : pprint.pformat(inputs),
                  'outputs' : pprint.pformat(outputs),
@@ -489,16 +521,19 @@ def GenerateSConscript(output_filename, spec, build_file, build_file_data):
            '    %s,\n'
            '    GYPCopy(\'$TARGET\', \'$SOURCE\'))\n')
     for f in copy['files']:
-      dest = os.path.join(destdir, os.path.basename(f))
+      # Remove trailing separators so basename() acts like Unix basename and
+      # always returns the last element, whether a file or dir. Without this,
+      # only the contents, not the directory itself, are copied (and nothing
+      # might be copied if dest already exists, since scons thinks nothing needs
+      # to be done).
+      dest = os.path.join(destdir, os.path.basename(f.rstrip(os.sep)))
       f = FixPath(f, src_subdir_)
       dest = FixPath(dest, src_subdir_)
       fp.write(fmt % (repr(dest), repr(f)))
       fp.write('target_files.extend(_outputs)\n')
 
-  if spec.get('run_as') or int(spec.get('test', 0)):
-    run_as = spec.get('run_as', {
-        'action' : ['$TARGET_NAME', '--gtest_print_time'],
-        })
+  run_as = spec.get('run_as')
+  if run_as:
     action = run_as.get('action', [])
     working_directory = run_as.get('working_directory')
     if not working_directory:
@@ -529,7 +564,7 @@ def GenerateSConscript(output_filename, spec, build_file, build_file_data):
     fp.write('  env.Requires(prerequisite, dependencies)\n')
   fp.write('env.Requires(gyp_target, prerequisites)\n')
 
-  if spec.get('run_as', 0) or int(spec.get('test', 0)):
+  if run_as:
     fp.write(_run_as_template_suffix % {
       'target_name': target_name,
     })
@@ -721,37 +756,36 @@ def compilable_files(env, sources):
 
 def GypProgram(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.Program('$TOP_BUILDDIR/' + str(target), source, *args, **kw)
+  result = env.Program(target, source, *args, **kw)
   if env.get('INCREMENTAL'):
     env.Precious(result)
   return result
 
 def GypTestProgram(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.Program('$TOP_BUILDDIR/' + str(target), source, *args, **kw)
+  result = env.Program(target, source, *args, **kw)
   if env.get('INCREMENTAL'):
     env.Precious(*result)
   return result
 
 def GypLibrary(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.Library('$LIB_DIR/' + str(target), source, *args, **kw)
+  result = env.Library(target, source, *args, **kw)
   return result
 
 def GypLoadableModule(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.LoadableModule('$TOP_BUILDDIR/' + str(target), source, *args,
-                              **kw)
+  result = env.LoadableModule(target, source, *args, **kw)
   return result
 
 def GypStaticLibrary(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.StaticLibrary('$LIB_DIR/' + str(target), source, *args, **kw)
+  result = env.StaticLibrary(target, source, *args, **kw)
   return result
 
 def GypSharedLibrary(env, target, source, *args, **kw):
   source = compilable_files(env, source)
-  result = env.SharedLibrary('$LIB_DIR/' + str(target), source, *args, **kw)
+  result = env.SharedLibrary(target, source, *args, **kw)
   if env.get('INCREMENTAL'):
     env.Precious(result)
   return result
@@ -975,15 +1009,13 @@ def GenerateOutput(target_list, target_dicts, data, params):
       spec['scons_dependencies'].append("Alias('%s')" % target_name)
       if td['type'] in ('static_library', 'shared_library'):
         libname = td.get('product_name', target_name)
-        spec['libraries'].append(libname)
+        spec['libraries'].append('lib' + libname)
       if td['type'] == 'loadable_module':
         prereqs = spec.get('scons_prerequisites', [])
         # TODO:  parameterize with <(SHARED_LIBRARY_*) variables?
         td_target = SCons.Target(td)
         td_target.target_prefix = '${SHLIBPREFIX}'
         td_target.target_suffix = '${SHLIBSUFFIX}'
-        prereqs.append(td_target.full_product_name())
-        spec['scons_prerequisites'] = prereqs
 
     GenerateSConscript(output_file, spec, build_file, data[build_file])
 

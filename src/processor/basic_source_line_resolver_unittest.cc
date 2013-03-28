@@ -27,10 +27,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <cstdio>
+#include <stdio.h>
+
 #include <string>
 
 #include "breakpad_googletest_includes.h"
+#include "common/using_std_string.h"
 #include "google_breakpad/processor/basic_source_line_resolver.h"
 #include "google_breakpad/processor/code_module.h"
 #include "google_breakpad/processor/stack_frame.h"
@@ -43,7 +45,6 @@
 
 namespace {
 
-using std::string;
 using google_breakpad::BasicSourceLineResolver;
 using google_breakpad::CFIFrameInfo;
 using google_breakpad::CodeModule;
@@ -199,6 +200,7 @@ TEST_F(TestBasicSourceLineResolver, TestLoadAndResolve)
   ASSERT_EQ(frame.source_line_base, 0x1000);
   windows_frame_info.reset(resolver.FindWindowsFrameInfo(&frame));
   ASSERT_TRUE(windows_frame_info.get());
+  ASSERT_EQ(windows_frame_info->type_, WindowsFrameInfo::STACK_INFO_FRAME_DATA);
   ASSERT_FALSE(windows_frame_info->allocates_base_pointer);
   ASSERT_EQ(windows_frame_info->program_string,
             "$eip 4 + ^ = $esp $ebp 8 + = $ebp $ebp ^ =");
@@ -218,6 +220,7 @@ TEST_F(TestBasicSourceLineResolver, TestLoadAndResolve)
   ASSERT_EQ(frame.source_line, 0);
   windows_frame_info.reset(resolver.FindWindowsFrameInfo(&frame));
   ASSERT_TRUE(windows_frame_info.get());
+  ASSERT_EQ(windows_frame_info->type_, WindowsFrameInfo::STACK_INFO_UNKNOWN);
   ASSERT_FALSE(windows_frame_info->allocates_base_pointer);
   ASSERT_TRUE(windows_frame_info->program_string.empty());
 
@@ -227,6 +230,7 @@ TEST_F(TestBasicSourceLineResolver, TestLoadAndResolve)
   ASSERT_TRUE(frame.source_file_name.empty());
   ASSERT_EQ(frame.source_line, 0);
   windows_frame_info.reset(resolver.FindWindowsFrameInfo(&frame));
+  ASSERT_EQ(windows_frame_info->type_, WindowsFrameInfo::STACK_INFO_FRAME_DATA);
   ASSERT_TRUE(windows_frame_info.get());
   ASSERT_FALSE(windows_frame_info->allocates_base_pointer);
   ASSERT_FALSE(windows_frame_info->program_string.empty());
@@ -350,6 +354,7 @@ TEST_F(TestBasicSourceLineResolver, TestLoadAndResolve)
   ASSERT_EQ(frame.source_line_base, 0x2180);
   windows_frame_info.reset(resolver.FindWindowsFrameInfo(&frame));
   ASSERT_TRUE(windows_frame_info.get());
+  ASSERT_EQ(windows_frame_info->type_, WindowsFrameInfo::STACK_INFO_FRAME_DATA);
   ASSERT_EQ(windows_frame_info->prolog_size, 1);
 
   frame.instruction = 0x216f;

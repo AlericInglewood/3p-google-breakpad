@@ -31,18 +31,23 @@
 // Implementation of dwarf2reader::LineInfo, dwarf2reader::CompilationUnit,
 // and dwarf2reader::CallFrameInfo. See dwarf2reader.h for details.
 
-#include <cassert>
-#include <cstdio>
-#include <cstring>
+#include "common/dwarf/dwarf2reader.h"
+
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <map>
 #include <memory>
 #include <stack>
+#include <string>
 #include <utility>
 
 #include "common/dwarf/bytereader-inl.h"
-#include "common/dwarf/dwarf2reader.h"
 #include "common/dwarf/bytereader.h"
 #include "common/dwarf/line_state_machine.h"
+#include "common/using_std_string.h"
 
 namespace dwarf2reader {
 
@@ -72,7 +77,7 @@ void CompilationUnit::ReadAbbrevs() {
     iter = sections_.find("__debug_abbrev");
   assert(iter != sections_.end());
 
-  abbrevs_ = new vector<Abbrev>;
+  abbrevs_ = new std::vector<Abbrev>;
   abbrevs_->resize(1);
 
   // The only way to check whether we are reading over the end of the
@@ -88,7 +93,7 @@ void CompilationUnit::ReadAbbrevs() {
   while (1) {
     CompilationUnit::Abbrev abbrev;
     size_t len;
-    const uint32 number = reader_->ReadUnsignedLEB128(abbrevptr, &len);
+    const uint64 number = reader_->ReadUnsignedLEB128(abbrevptr, &len);
 
     if (number == 0)
       break;
@@ -96,7 +101,7 @@ void CompilationUnit::ReadAbbrevs() {
     abbrevptr += len;
 
     assert(abbrevptr < abbrev_start + abbrev_length);
-    const uint32 tag = reader_->ReadUnsignedLEB128(abbrevptr, &len);
+    const uint64 tag = reader_->ReadUnsignedLEB128(abbrevptr, &len);
     abbrevptr += len;
     abbrev.tag = static_cast<enum DwarfTag>(tag);
 
@@ -107,11 +112,11 @@ void CompilationUnit::ReadAbbrevs() {
     assert(abbrevptr < abbrev_start + abbrev_length);
 
     while (1) {
-      const uint32 nametemp = reader_->ReadUnsignedLEB128(abbrevptr, &len);
+      const uint64 nametemp = reader_->ReadUnsignedLEB128(abbrevptr, &len);
       abbrevptr += len;
 
       assert(abbrevptr < abbrev_start + abbrev_length);
-      const uint32 formtemp = reader_->ReadUnsignedLEB128(abbrevptr, &len);
+      const uint64 formtemp = reader_->ReadUnsignedLEB128(abbrevptr, &len);
       abbrevptr += len;
       if (nametemp == 0 && formtemp == 0)
         break;
@@ -119,7 +124,7 @@ void CompilationUnit::ReadAbbrevs() {
       const enum DwarfAttribute name =
         static_cast<enum DwarfAttribute>(nametemp);
       const enum DwarfForm form = static_cast<enum DwarfForm>(formtemp);
-      abbrev.attributes.push_back(make_pair(name, form));
+      abbrev.attributes.push_back(std::make_pair(name, form));
     }
     assert(abbrev.number == abbrevs_->size());
     abbrevs_->push_back(abbrev);
@@ -148,41 +153,35 @@ const char* CompilationUnit::SkipAttribute(const char* start,
                                                                      &len));
       start += len;
       return SkipAttribute(start, form);
-      break;
 
+    case DW_FORM_flag_present:
+      return start;
     case DW_FORM_data1:
     case DW_FORM_flag:
     case DW_FORM_ref1:
       return start + 1;
-      break;
     case DW_FORM_ref2:
     case DW_FORM_data2:
       return start + 2;
-      break;
     case DW_FORM_ref4:
     case DW_FORM_data4:
       return start + 4;
-      break;
     case DW_FORM_ref8:
     case DW_FORM_data8:
+    case DW_FORM_ref_sig8:
       return start + 8;
-      break;
     case DW_FORM_string:
       return start + strlen(start) + 1;
-      break;
     case DW_FORM_udata:
     case DW_FORM_ref_udata:
       reader_->ReadUnsignedLEB128(start, &len);
       return start + len;
-      break;
 
     case DW_FORM_sdata:
       reader_->ReadSignedLEB128(start, &len);
       return start + len;
-      break;
     case DW_FORM_addr:
       return start + reader_->AddressSize();
-      break;
     case DW_FORM_ref_addr:
       // DWARF2 and 3 differ on whether ref_addr is address size or
       // offset size.
@@ -192,27 +191,21 @@ const char* CompilationUnit::SkipAttribute(const char* start,
       } else if (header_.version == 3) {
         return start + reader_->OffsetSize();
       }
-      break;
 
     case DW_FORM_block1:
       return start + 1 + reader_->ReadOneByte(start);
-      break;
     case DW_FORM_block2:
       return start + 2 + reader_->ReadTwoBytes(start);
-      break;
     case DW_FORM_block4:
       return start + 4 + reader_->ReadFourBytes(start);
-      break;
-    case DW_FORM_block: {
+    case DW_FORM_block:
+    case DW_FORM_exprloc: {
       uint64 size = reader_->ReadUnsignedLEB128(start, &len);
       return start + size + len;
     }
-      break;
     case DW_FORM_strp:
-        return start + reader_->OffsetSize();
-      break;
-    default:
-      fprintf(stderr,"Unhandled form type");
+    case DW_FORM_sec_offset:
+      return start + reader_->OffsetSize();
   }
   fprintf(stderr,"Unhandled form type");
   return NULL;
@@ -324,85 +317,78 @@ const char* CompilationUnit::ProcessAttribute(
                                                                      &len));
       start += len;
       return ProcessAttribute(dieoffset, start, attr, form);
-      break;
 
+    case DW_FORM_flag_present:
+      handler_->ProcessAttributeUnsigned(dieoffset, attr, form, 1);
+      return start;
     case DW_FORM_data1:
     case DW_FORM_flag:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadOneByte(start));
       return start + 1;
-      break;
     case DW_FORM_data2:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadTwoBytes(start));
       return start + 2;
-      break;
     case DW_FORM_data4:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadFourBytes(start));
       return start + 4;
-      break;
     case DW_FORM_data8:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadEightBytes(start));
       return start + 8;
-      break;
     case DW_FORM_string: {
       const char* str = start;
       handler_->ProcessAttributeString(dieoffset, attr, form,
                                        str);
       return start + strlen(str) + 1;
     }
-      break;
     case DW_FORM_udata:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadUnsignedLEB128(start,
                                                                      &len));
       return start + len;
-      break;
 
     case DW_FORM_sdata:
       handler_->ProcessAttributeSigned(dieoffset, attr, form,
                                       reader_->ReadSignedLEB128(start, &len));
       return start + len;
-      break;
     case DW_FORM_addr:
       handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
                                          reader_->ReadAddress(start));
       return start + reader_->AddressSize();
-      break;
+    case DW_FORM_sec_offset:
+      handler_->ProcessAttributeUnsigned(dieoffset, attr, form,
+                                         reader_->ReadOffset(start));
+      return start + reader_->OffsetSize();
 
     case DW_FORM_ref1:
       handler_->ProcessAttributeReference(dieoffset, attr, form,
                                           reader_->ReadOneByte(start)
                                           + offset_from_section_start_);
       return start + 1;
-      break;
     case DW_FORM_ref2:
       handler_->ProcessAttributeReference(dieoffset, attr, form,
                                           reader_->ReadTwoBytes(start)
                                           + offset_from_section_start_);
       return start + 2;
-      break;
     case DW_FORM_ref4:
       handler_->ProcessAttributeReference(dieoffset, attr, form,
                                           reader_->ReadFourBytes(start)
                                           + offset_from_section_start_);
       return start + 4;
-      break;
     case DW_FORM_ref8:
       handler_->ProcessAttributeReference(dieoffset, attr, form,
                                           reader_->ReadEightBytes(start)
                                           + offset_from_section_start_);
       return start + 8;
-      break;
     case DW_FORM_ref_udata:
       handler_->ProcessAttributeReference(dieoffset, attr, form,
                                           reader_->ReadUnsignedLEB128(start,
                                                                       &len)
                                           + offset_from_section_start_);
       return start + len;
-      break;
     case DW_FORM_ref_addr:
       // DWARF2 and 3 differ on whether ref_addr is address size or
       // offset size.
@@ -417,35 +403,36 @@ const char* CompilationUnit::ProcessAttribute(
         return start + reader_->OffsetSize();
       }
       break;
+    case DW_FORM_ref_sig8:
+      handler_->ProcessAttributeSignature(dieoffset, attr, form,
+                                          reader_->ReadEightBytes(start));
+      return start + 8;
 
     case DW_FORM_block1: {
       uint64 datalen = reader_->ReadOneByte(start);
       handler_->ProcessAttributeBuffer(dieoffset, attr, form, start + 1,
-                                      datalen);
+                                       datalen);
       return start + 1 + datalen;
     }
-      break;
     case DW_FORM_block2: {
       uint64 datalen = reader_->ReadTwoBytes(start);
       handler_->ProcessAttributeBuffer(dieoffset, attr, form, start + 2,
-                                      datalen);
+                                       datalen);
       return start + 2 + datalen;
     }
-      break;
     case DW_FORM_block4: {
       uint64 datalen = reader_->ReadFourBytes(start);
       handler_->ProcessAttributeBuffer(dieoffset, attr, form, start + 4,
-                                      datalen);
+                                       datalen);
       return start + 4 + datalen;
     }
-      break;
-    case DW_FORM_block: {
+    case DW_FORM_block:
+    case DW_FORM_exprloc: {
       uint64 datalen = reader_->ReadUnsignedLEB128(start, &len);
       handler_->ProcessAttributeBuffer(dieoffset, attr, form, start + len,
-                                      datalen);
+                                       datalen);
       return start + datalen + len;
     }
-      break;
     case DW_FORM_strp: {
       assert(string_buffer_ != NULL);
 
@@ -457,11 +444,8 @@ const char* CompilationUnit::ProcessAttribute(
                                        str);
       return start + reader_->OffsetSize();
     }
-      break;
-    default:
-      fprintf(stderr, "Unhandled form type");
   }
-  fprintf(stderr, "Unhandled form type");
+  fprintf(stderr, "Unhandled form type\n");
   return NULL;
 }
 
@@ -491,11 +475,8 @@ void CompilationUnit::ProcessDIEs() {
   else
     lengthstart += 4;
 
-  // we need semantics of boost scoped_ptr here - no intention of trasnferring
-  // ownership of the stack.  use const, but then we limit ourselves to not
-  // ever being able to call .reset() on the smart pointer.
-  std::auto_ptr<stack<uint64> > const die_stack(new stack<uint64>);
-
+  std::stack<uint64> die_stack;
+  
   while (dieptr < (lengthstart + header_.length)) {
     // We give the user the absolute offset from the beginning of
     // debug_info, since they need it to deal with ref_addr forms.
@@ -505,15 +486,19 @@ void CompilationUnit::ProcessDIEs() {
 
     dieptr += len;
 
-    // Abbrev == 0 represents the end of a list of children.
+    // Abbrev == 0 represents the end of a list of children, or padding
+    // at the end of the compilation unit.
     if (abbrev_num == 0) {
-      const uint64 offset = die_stack->top();
-      die_stack->pop();
+      if (die_stack.size() == 0)
+        // If it is padding, then we are done with the compilation unit's DIEs.
+        return;
+      const uint64 offset = die_stack.top();
+      die_stack.pop();
       handler_->EndDIE(offset);
       continue;
     }
 
-    const Abbrev& abbrev = abbrevs_->at(abbrev_num);
+    const Abbrev& abbrev = abbrevs_->at(static_cast<size_t>(abbrev_num));
     const enum DwarfTag tag = abbrev.tag;
     if (!handler_->StartDIE(absolute_offset, tag, abbrev.attributes)) {
       dieptr = SkipDIE(dieptr, abbrev);
@@ -522,7 +507,7 @@ void CompilationUnit::ProcessDIEs() {
     }
 
     if (abbrev.has_children) {
-      die_stack->push(absolute_offset);
+      die_stack.push(absolute_offset);
     } else {
       handler_->EndDIE(absolute_offset);
     }
@@ -580,7 +565,7 @@ void LineInfo::ReadHeader() {
   header_.opcode_base = reader_->ReadOneByte(lineptr);
   lineptr += 1;
 
-  header_.std_opcode_lengths = new vector<unsigned char>;
+  header_.std_opcode_lengths = new std::vector<unsigned char>;
   header_.std_opcode_lengths->resize(header_.opcode_base + 1);
   (*header_.std_opcode_lengths)[0] = 0;
   for (int i = 1; i < header_.opcode_base; i++) {
@@ -616,8 +601,8 @@ void LineInfo::ReadHeader() {
 
       uint64 filelength = reader_->ReadUnsignedLEB128(lineptr, &len);
       lineptr += len;
-      handler_->DefineFile(filename, fileindex, dirindex, mod_time,
-                           filelength);
+      handler_->DefineFile(filename, fileindex, static_cast<uint32>(dirindex), 
+                           mod_time, filelength);
       fileindex++;
     }
   }
@@ -647,7 +632,7 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
     opcode -= header.opcode_base;
     const int64 advance_address = (opcode / header.line_range)
                                   * header.min_insn_length;
-    const int64 advance_line = (opcode % header.line_range)
+    const int32 advance_line = (opcode % header.line_range)
                                + header.line_base;
 
     // Check if the lsm passes "pc". If so, mark it as passed.
@@ -687,7 +672,7 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
     case DW_LNS_advance_line: {
       const int64 advance_line = reader->ReadSignedLEB128(start, &templen);
       oplen += templen;
-      lsm->line_num += advance_line;
+      lsm->line_num += static_cast<int32>(advance_line);
 
       // With gcc 4.2.1, we can get the line_no here for the first time
       // since DW_LNS_advance_line is called after DW_LNE_set_address is
@@ -701,13 +686,13 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
     case DW_LNS_set_file: {
       const uint64 fileno = reader->ReadUnsignedLEB128(start, &templen);
       oplen += templen;
-      lsm->file_num = fileno;
+      lsm->file_num = static_cast<uint32>(fileno);
     }
       break;
     case DW_LNS_set_column: {
       const uint64 colno = reader->ReadUnsignedLEB128(start, &templen);
       oplen += templen;
-      lsm->column_num = colno;
+      lsm->column_num = static_cast<uint32>(colno);
     }
       break;
     case DW_LNS_negate_stmt: {
@@ -746,7 +731,7 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
     }
       break;
     case DW_LNS_extended_op: {
-      const size_t extended_op_len = reader->ReadUnsignedLEB128(start,
+      const uint64 extended_op_len = reader->ReadUnsignedLEB128(start,
                                                                 &templen);
       start += templen;
       oplen += templen + extended_op_len;
@@ -788,8 +773,8 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
           oplen += templen;
 
           if (handler) {
-            handler->DefineFile(filename, -1, dirindex, mod_time,
-                                filelength);
+            handler->DefineFile(filename, -1, static_cast<uint32>(dirindex), 
+                                mod_time, filelength);
           }
         }
           break;
@@ -801,7 +786,6 @@ bool LineInfo::ProcessOneOpcode(ByteReader* reader,
       // Ignore unknown opcode  silently
       if (header.std_opcode_lengths) {
         for (int i = 0; i < (*header.std_opcode_lengths)[opcode]; i++) {
-          size_t templen;
           reader->ReadUnsignedLEB128(start, &templen);
           start += templen;
           oplen += templen;
@@ -969,7 +953,7 @@ class CallFrameInfo::OffsetRule: public CallFrameInfo::Rule {
   // computes the address at which a register is saved, not a value.
  private:
   int base_register_;
-  int offset_;
+  long offset_;
 };
 
 // Rule: the value the register had in the caller is the value of
@@ -996,7 +980,7 @@ class CallFrameInfo::ValOffsetRule: public CallFrameInfo::Rule {
   void SetOffset(long long offset) { offset_ = offset; }
  private:
   int base_register_;
-  int offset_;
+  long offset_;
 };
 
 // Rule: the register has been saved in another register REGISTER_NUMBER_.
@@ -1094,7 +1078,7 @@ class CallFrameInfo::RuleMap {
 
  private:
   // A map from register numbers to Rules.
-  typedef map<int, Rule *> RuleByNumber;
+  typedef std::map<int, Rule *> RuleByNumber;
 
   // Remove all register rules and clear cfa_rule_.
   void Clear();
@@ -1339,7 +1323,7 @@ class CallFrameInfo::State {
 
   // A stack of saved states, for DW_CFA_remember_state and
   // DW_CFA_restore_state.
-  stack<RuleMap> saved_rules_;
+  std::stack<RuleMap> saved_rules_;
 };
 
 bool CallFrameInfo::State::InterpretCIE(const CIE &cie) {
@@ -1875,20 +1859,14 @@ bool CallFrameInfo::ReadCIEFields(CIE *cie) {
   cie->version = reader_->ReadOneByte(cursor);
   cursor++;
 
-  // If we don't recognize the version, we can't parse any more fields
-  // of the CIE. For DWARF CFI, we handle versions 1 through 3 (there
-  // was never a version 2 of CFI data). For .eh_frame, we handle only
-  // version 1.
-  if (eh_frame_) {
-    if (cie->version != 1) {
-      reporter_->UnrecognizedVersion(cie->offset, cie->version);
-      return false;
-    }
-  } else {
-    if (cie->version < 1 || cie->version > 3) {
-      reporter_->UnrecognizedVersion(cie->offset, cie->version);
-      return false;
-    }
+  // If we don't recognize the version, we can't parse any more fields of the
+  // CIE. For DWARF CFI, we handle versions 1 through 3 (there was never a
+  // version 2 of CFI data). For .eh_frame, we handle versions 1 and 3 as well;
+  // the difference between those versions seems to be the same as for
+  // .debug_frame.
+  if (cie->version < 1 || cie->version > 3) {
+    reporter_->UnrecognizedVersion(cie->offset, cie->version);
+    return false;
   }
 
   const char *augmentation_start = cursor;
@@ -1896,7 +1874,8 @@ bool CallFrameInfo::ReadCIEFields(CIE *cie) {
       memchr(augmentation_start, '\0', cie->end - augmentation_start);
   if (! augmentation_end) return ReportIncomplete(cie);
   cursor = static_cast<const char *>(augmentation_end);
-  cie->augmentation = string(augmentation_start, cursor - augmentation_start);
+  cie->augmentation = string(augmentation_start,
+                                  cursor - augmentation_start);
   // Skip the terminating '\0'.
   cursor++;
 
@@ -1938,7 +1917,7 @@ bool CallFrameInfo::ReadCIEFields(CIE *cie) {
   // If we have a 'z' augmentation string, find the augmentation data and
   // use the augmentation string to parse it.
   if (cie->has_z_augmentation) {
-    size_t data_size = reader_->ReadUnsignedLEB128(cursor, &len);
+    uint64_t data_size = reader_->ReadUnsignedLEB128(cursor, &len);
     if (size_t(cie->end - cursor) < len + data_size)
       return ReportIncomplete(cie);
     cursor += len;
@@ -2058,7 +2037,7 @@ bool CallFrameInfo::ReadFDEFields(FDE *fde) {
   // If the CIE has a 'z' augmentation string, then augmentation data
   // appears here.
   if (fde->cie->has_z_augmentation) {
-    size_t data_size = reader_->ReadUnsignedLEB128(cursor, &size);
+    uint64_t data_size = reader_->ReadUnsignedLEB128(cursor, &size);
     if (size_t(fde->end - cursor) < size + data_size)
       return ReportIncomplete(fde);
     cursor += size;

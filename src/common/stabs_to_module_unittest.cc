@@ -74,6 +74,67 @@ TEST(StabsToModule, SimpleCU) {
   EXPECT_EQ(174823314, line->number);
 }
 
+#ifdef __GNUC__
+// Function name mangling can vary by compiler, so only run mangled-name
+// tests on GCC for simplicity's sake.
+TEST(StabsToModule, Externs) {
+  Module m("name", "os", "arch", "id");
+  StabsToModule h(&m);
+
+  // Feed in a few Extern symbols.
+  EXPECT_TRUE(h.Extern("_foo", 0xffff));
+  EXPECT_TRUE(h.Extern("__Z21dyldGlobalLockAcquirev", 0xaaaa));
+  EXPECT_TRUE(h.Extern("_MorphTableGetNextMorphChain", 0x1111));
+  h.Finalize();
+
+  // Now check to see what has been added to the Module.
+  vector<Module::Extern *> externs;
+  m.GetExterns(&externs, externs.end());
+  ASSERT_EQ((size_t) 3, externs.size());
+  Module::Extern *extern1 = externs[0];
+  EXPECT_STREQ("MorphTableGetNextMorphChain", extern1->name.c_str());
+  EXPECT_EQ((Module::Address)0x1111, extern1->address);
+  Module::Extern *extern2 = externs[1];
+  EXPECT_STREQ("dyldGlobalLockAcquire()", extern2->name.c_str());
+  EXPECT_EQ((Module::Address)0xaaaa, extern2->address);
+  Module::Extern *extern3 = externs[2];
+  EXPECT_STREQ("foo", extern3->name.c_str());
+  EXPECT_EQ((Module::Address)0xffff, extern3->address);
+}
+#endif  // __GNUC__
+
+TEST(StabsToModule, DuplicateFunctionNames) {
+  Module m("name", "os", "arch", "id");
+  StabsToModule h(&m);
+
+  // Compilation unit with one function, mangled name.
+  EXPECT_TRUE(h.StartCompilationUnit("compilation-unit", 0xf2cfda36ecf7f46cLL,
+                                     "build-directory"));
+  EXPECT_TRUE(h.StartFunction("funcfoo",
+                              0xf2cfda36ecf7f46dLL));
+  EXPECT_TRUE(h.EndFunction(0));
+  EXPECT_TRUE(h.StartFunction("funcfoo",
+                              0xf2cfda36ecf7f46dLL));
+  EXPECT_TRUE(h.EndFunction(0));
+  EXPECT_TRUE(h.EndCompilationUnit(0));
+
+  h.Finalize();
+
+  // Now check to see what has been added to the Module.
+  Module::File *file = m.FindExistingFile("compilation-unit");
+  ASSERT_TRUE(file != NULL);
+
+  vector<Module::Function *> functions;
+  m.GetFunctions(&functions, functions.end());
+  ASSERT_EQ(1U, functions.size());
+
+  Module::Function *function = functions[0];
+  EXPECT_EQ(0xf2cfda36ecf7f46dLL, function->address);
+  EXPECT_LT(0U, function->size);  // should have used dummy size
+  EXPECT_EQ(0U, function->parameter_size);
+  ASSERT_EQ(0U, function->lines.size());
+}
+
 TEST(InferSizes, LineSize) {
   Module m("name", "os", "arch", "id");
   StabsToModule h(&m);
@@ -88,7 +149,7 @@ TEST(InferSizes, LineSize) {
   EXPECT_TRUE(h.EndFunction(0));  // unknown function end address
   EXPECT_TRUE(h.EndCompilationUnit(0)); // unknown CU end address
   EXPECT_TRUE(h.StartCompilationUnit("compilation-unit-2", 0xb4523963eff94e92LL,
-                                     "build-directory-2")); // next boundary  
+                                     "build-directory-2")); // next boundary
   EXPECT_TRUE(h.EndCompilationUnit(0));
   h.Finalize();
 
@@ -122,6 +183,9 @@ TEST(InferSizes, LineSize) {
   EXPECT_EQ(87660088, line2->number);
 }
 
+#ifdef __GNUC__
+// Function name mangling can vary by compiler, so only run mangled-name
+// tests on GCC for simplicity's sake.
 TEST(FunctionNames, Mangled) {
   Module m("name", "os", "arch", "id");
   StabsToModule h(&m);
@@ -156,6 +220,7 @@ TEST(FunctionNames, Mangled) {
   EXPECT_EQ(0U, function->parameter_size);
   ASSERT_EQ(0U, function->lines.size());
 }
+#endif  // __GNUC__
 
 // The GNU toolchain can omit functions that are not used; however,
 // when it does so, it doesn't clean up the debugging information that

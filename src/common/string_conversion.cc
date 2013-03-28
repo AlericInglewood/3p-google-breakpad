@@ -27,14 +27,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "common/convert_UTF.h"
-#include "processor/scoped_ptr.h"
-#include "common/string_conversion.h"
 #include <string.h>
+
+#include "common/convert_UTF.h"
+#include "common/string_conversion.h"
+#include "common/using_std_string.h"
+#include "processor/scoped_ptr.h"
 
 namespace google_breakpad {
 
-using std::string;
 using std::vector;
 
 void UTF8ToUTF16(const char *in, vector<u_int16_t> *out) {
@@ -42,7 +43,7 @@ void UTF8ToUTF16(const char *in, vector<u_int16_t> *out) {
   const UTF8 *source_ptr = reinterpret_cast<const UTF8 *>(in);
   const UTF8 *source_end_ptr = source_ptr + source_length;
   // Erase the contents and zero fill to the expected size
-  out->empty();
+  out->clear();
   out->insert(out->begin(), source_length, 0);
   u_int16_t *target_ptr = &(*out)[0];
   u_int16_t *target_end_ptr = target_ptr + out->capacity() * sizeof(u_int16_t);
@@ -68,7 +69,7 @@ int UTF8ToUTF16Char(const char *in, int in_length, u_int16_t out[2]) {
                                                  strictConversion);
 
     if (result == conversionOK)
-      return source_ptr - reinterpret_cast<const UTF8 *>(in);
+      return static_cast<int>(source_ptr - reinterpret_cast<const UTF8 *>(in));
 
     // Add another character to the input stream and try again
     source_ptr = reinterpret_cast<const UTF8 *>(in);
@@ -86,7 +87,7 @@ void UTF32ToUTF16(const wchar_t *in, vector<u_int16_t> *out) {
   const UTF32 *source_ptr = reinterpret_cast<const UTF32 *>(in);
   const UTF32 *source_end_ptr = source_ptr + source_length;
   // Erase the contents and zero fill to the expected size
-  out->empty();
+  out->clear();
   out->insert(out->begin(), source_length, 0);
   u_int16_t *target_ptr = &(*out)[0];
   u_int16_t *target_end_ptr = target_ptr + out->capacity() * sizeof(u_int16_t);
@@ -114,7 +115,7 @@ void UTF32ToUTF16Char(wchar_t in, u_int16_t out[2]) {
 }
 
 static inline u_int16_t Swap(u_int16_t value) {
-  return (value >> 8) | (value << 8);
+  return (value >> 8) | static_cast<u_int16_t>(value << 8);
 }
 
 string UTF16ToUTF8(const vector<u_int16_t> &in, bool swap) {
@@ -135,7 +136,7 @@ string UTF16ToUTF8(const vector<u_int16_t> &in, bool swap) {
 
   // The maximum expansion would be 4x the size of the input string.
   const UTF16 *source_end_ptr = source_ptr + in.size();
-  int target_capacity = in.size() * 4;
+  size_t target_capacity = in.size() * 4;
   scoped_array<UTF8> target_buffer(new UTF8[target_capacity]);
   UTF8 *target_ptr = target_buffer.get();
   UTF8 *target_end_ptr = target_ptr + target_capacity;
@@ -145,8 +146,7 @@ string UTF16ToUTF8(const vector<u_int16_t> &in, bool swap) {
 
   if (result == conversionOK) {
     const char *targetPtr = reinterpret_cast<const char *>(target_buffer.get());
-    string result(targetPtr);
-    return result;
+    return targetPtr;
   }
 
   return "";

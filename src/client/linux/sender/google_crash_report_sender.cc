@@ -28,11 +28,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common/linux/google_crashdump_uploader.h"
-#include "third_party/linux/include/glog/logging.h"
 #include "third_party/linux/include/gflags/gflags.h"
 #include <string>
+#include <iostream>
 
-DEFINE_string(crash_server, "http://clients2.google.com/cr",
+#include "common/using_std_string.h"
+
+DEFINE_string(crash_server, "https://clients2.google.com/cr",
               "The crash server to upload minidumps to.");
 DEFINE_string(product_name, "",
               "The product name that the minidump corresponds to.");
@@ -57,7 +59,7 @@ DEFINE_string(proxy_userpasswd, "",
 
 
 bool CheckForRequiredFlagsOrDie() {
-  std::string error_text = "";
+  string error_text = "";
   if (FLAGS_product_name.empty()) {
     error_text.append("\nProduct name must be specified.");
   }
@@ -75,7 +77,7 @@ bool CheckForRequiredFlagsOrDie() {
   }
 
   if (!error_text.empty()) {
-    LOG(ERROR) << error_text;
+    std::cout << error_text;
     return false;
   }
   return true;

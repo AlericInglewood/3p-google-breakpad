@@ -44,9 +44,9 @@ provided by the TestCommon class:
 
     test.must_match('file', "expected contents\n")
 
-    test.must_not_contain('file', 'required text\n')
-
     test.must_not_be_writable('file1', ['file2', ...])
+
+    test.must_not_contain('file', 'banned text\n')
 
     test.must_not_contain_any_line(output, lines, ['title', find])
 
@@ -72,7 +72,7 @@ The TestCommon module also provides the following variables
 
 """
 
-# Copyright 2000, 2001, 2002, 2003, 2004 Steven Knight
+# Copyright 2000-2010 Steven Knight
 # This module is free software, and you may redistribute it and/or modify
 # it under the same terms as Python itself, so long as this copyright message
 # and disclaimer are retained in their original form.
@@ -89,8 +89,8 @@ The TestCommon module also provides the following variables
 # SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steven Knight <knight at baldmt dot com>"
-__revision__ = "TestCommon.py 0.36.D001 2009/07/24 08:45:26 knight"
-__version__ = "0.36"
+__revision__ = "TestCommon.py 0.37.D001 2010/01/11 16:55:50 knight"
+__version__ = "0.37"
 
 import copy
 import os
@@ -189,19 +189,17 @@ def separate_files(flist):
             missing.append(f)
     return existing, missing
 
-if os.name == 'posix':
-    def _failed(self, status = 0):
-        if self.status is None or status is None:
-            return None
+def _failed(self, status = 0):
+    if self.status is None or status is None:
+        return None
+    try:
+        return _status(self) not in status
+    except TypeError:
+        # status wasn't an iterable
         return _status(self) != status
-    def _status(self):
-        return self.status
-elif os.name == 'nt':
-    def _failed(self, status = 0):
-        return not (self.status is None or status is None) and \
-               self.status != status
-    def _status(self):
-        return self.status
+
+def _status(self):
+    return self.status
 
 class TestCommon(TestCmd):
 
@@ -346,7 +344,7 @@ class TestCommon(TestCmd):
             print banned
             print self.banner('%s contents ' % file)
             print file_contents
-            self.fail_test(not contains)
+            self.fail_test(contains)
 
     def must_not_contain_any_line(self, output, lines, title=None, find=None):
         """Ensures that the specified output string (first argument)
@@ -390,7 +388,6 @@ class TestCommon(TestCmd):
         if existing:
             print "Unexpected files exist: `%s'" % string.join(existing, "', `")
             self.fail_test(existing)
-
 
     def must_not_be_writable(self, *files):
         """Ensures that the specified file(s) exist and are not writable.
@@ -446,17 +443,13 @@ class TestCommon(TestCmd):
 
         This handles the "options" keyword argument and exceptions.
         """
-        try:
-            options = kw['options']
-            del kw['options']
-        except KeyError:
-            pass
-        else:
-            if options:
-                if arguments is None:
-                    arguments = options
-                else:
-                    arguments = options + " " + arguments
+        options = kw.pop('options', None)
+        if options:
+            if arguments is None:
+                arguments = options
+            else:
+                arguments = options + " " + arguments
+
         try:
             return apply(TestCmd.start,
                          (self, program, interpreter, arguments, universal_newlines),
@@ -533,11 +526,7 @@ class TestCommon(TestCmd):
             else:
                 arguments = options + " " + arguments
         kw['arguments'] = arguments
-        try:
-            match = kw['match']
-            del kw['match']
-        except KeyError:
-            match = self.match
+        match = kw.pop('match', self.match)
         apply(TestCmd.run, [self], kw)
         self._complete(self.stdout(), stdout,
                        self.stderr(), stderr, status, match)

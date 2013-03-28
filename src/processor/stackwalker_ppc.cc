@@ -43,13 +43,12 @@
 namespace google_breakpad {
 
 
-StackwalkerPPC::StackwalkerPPC(const SystemInfo *system_info,
-                               const MDRawContextPPC *context,
-                               MemoryRegion *memory,
-                               const CodeModules *modules,
-                               SymbolSupplier *supplier,
-                               SourceLineResolverInterface *resolver)
-    : Stackwalker(system_info, memory, modules, supplier, resolver),
+StackwalkerPPC::StackwalkerPPC(const SystemInfo* system_info,
+                               const MDRawContextPPC* context,
+                               MemoryRegion* memory,
+                               const CodeModules* modules,
+                               StackFrameSymbolizer* resolver_helper)
+    : Stackwalker(system_info, memory, modules, resolver_helper),
       context_(context) {
   if (memory_->GetBase() + memory_->GetSize() - 1 > 0xffffffff) {
     // This implementation only covers 32-bit ppc CPUs.  The limits of the
@@ -69,19 +68,20 @@ StackFrame* StackwalkerPPC::GetContextFrame() {
     return NULL;
   }
 
-  StackFramePPC *frame = new StackFramePPC();
+  StackFramePPC* frame = new StackFramePPC();
 
   // The instruction pointer is stored directly in a register, so pull it
   // straight out of the CPU context structure.
   frame->context = *context_;
   frame->context_validity = StackFramePPC::CONTEXT_VALID_ALL;
+  frame->trust = StackFrame::FRAME_TRUST_CONTEXT;
   frame->instruction = frame->context.srr0;
 
   return frame;
 }
 
 
-StackFrame* StackwalkerPPC::GetCallerFrame(const CallStack *stack) {
+StackFrame* StackwalkerPPC::GetCallerFrame(const CallStack* stack) {
   if (!memory_ || !stack) {
     BPLOG(ERROR) << "Can't get caller frame without memory or stack";
     return NULL;
@@ -96,7 +96,7 @@ StackFrame* StackwalkerPPC::GetCallerFrame(const CallStack *stack) {
   // frame pointer, and what is typically thought of as the frame pointer on
   // an x86 is usually referred to as the stack pointer on a ppc.
 
-  StackFramePPC *last_frame = static_cast<StackFramePPC*>(
+  StackFramePPC* last_frame = static_cast<StackFramePPC*>(
       stack->frames()->back());
 
   // A caller frame must reside higher in memory than its callee frames.
@@ -120,13 +120,14 @@ StackFrame* StackwalkerPPC::GetCallerFrame(const CallStack *stack) {
     return NULL;
   }
 
-  StackFramePPC *frame = new StackFramePPC();
+  StackFramePPC* frame = new StackFramePPC();
 
   frame->context = last_frame->context;
   frame->context.srr0 = instruction;
   frame->context.gpr[1] = stack_pointer;
   frame->context_validity = StackFramePPC::CONTEXT_VALID_SRR0 |
                             StackFramePPC::CONTEXT_VALID_GPR1;
+  frame->trust = StackFrame::FRAME_TRUST_FP;
 
   // frame->context.srr0 is the return address, which is one instruction
   // past the branch that caused us to arrive at the callee.  Set

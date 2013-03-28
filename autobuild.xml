@@ -32,7 +32,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>include/google_breakpad/*.h</string>
+            <string>include/google_breakpad/*</string>
             <string>lib/release/*.dylib</string>
             <string>bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
@@ -62,7 +62,8 @@
           <key>manifest</key>
           <array>
             <string>lib/release/*</string>
-            <string>include/google_breakpad/processor/*</string>
+            <string>include/google_breakpad/common/*</string>
+            <string>include/google_breakpad/processor/*.h</string>
             <string>include/google_breakpad/*.h</string>
             <string>include/google_breakpad/client/linux/crash_generation/*</string>
             <string>bin/dump_syms</string>
@@ -98,10 +99,11 @@
           <array>
             <string>include/google_breakpad/*.h</string>
             <string>include/google_breakpad/client/windows/common/*.h</string>
+            <string>include/google_breakpad/processor/*.h</string>
             <string>include/google_breakpad/client/windows/crash_generation/*.h</string>
             <string>include/google_breakpad/common/windows/*.h</string>
             <string>include/google_breakpad/google_breakpad/common/*.h</string>
-            <string>include/google_breakpad/processor/*.h</string>
+            <string>include/google_breakpad/common/*.h</string>
             <string>lib/release/*.lib</string>
             <string>lib/debug/*.lib</string>
             <string>bin/dump_syms.exe</string>
@@ -114,7 +116,7 @@
       <key>source_directory</key>
       <string>stage</string>
       <key>version</key>
-      <string>0.0.0-rev599</string>
+      <string>0.0.0-rev1099</string>
     </map>
     <key>type</key>
     <string>autobuild</string>

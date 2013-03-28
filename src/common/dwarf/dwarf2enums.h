@@ -143,7 +143,13 @@ enum DwarfForm {
   DW_FORM_ref4 = 0x13,
   DW_FORM_ref8 = 0x14,
   DW_FORM_ref_udata = 0x15,
-  DW_FORM_indirect = 0x16
+  DW_FORM_indirect = 0x16,
+
+  // Added in DWARF 4:
+  DW_FORM_sec_offset = 0x17,
+  DW_FORM_exprloc = 0x18,
+  DW_FORM_flag_present = 0x19,
+  DW_FORM_ref_sig8 = 0x20
 };
 
 // Attribute names and codes
@@ -529,7 +535,7 @@ enum DwarfInline {
   DW_INL_not_inlined                 =0x0,
   DW_INL_inlined                     =0x1,
   DW_INL_declared_not_inlined        =0x2,
-  DW_INL_declared_inlined            =0x3,
+  DW_INL_declared_inlined            =0x3
 };
 
 // Call Frame Info instructions.

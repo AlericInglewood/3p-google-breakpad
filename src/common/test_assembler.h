@@ -60,15 +60,15 @@
 #include <vector>
 #include <string>
 
+#include "common/using_std_string.h"
 #include "google_breakpad/common/breakpad_types.h"
 
 namespace google_breakpad {
 
 using std::list;
-using std::string;
 using std::vector;
 
-namespace TestAssembler {
+namespace test_assembler {
 
 // A Label represents a value not yet known that we need to store in a
 // section. As long as all the labels a section refers to are defined
@@ -271,7 +271,10 @@ class Section {
  public:
   Section(Endianness endianness = kUnsetEndian)
       : endianness_(endianness) { };
-  ~Section() { };
+
+  // A base class destructor should be either public and virtual,
+  // or protected and nonvirtual.
+  virtual ~Section() { };
 
   // Set the default endianness of this section to ENDIANNESS. This
   // sets the behavior of the D<N> appending functions. If the
@@ -475,7 +478,7 @@ class Section {
   Label start_;
 };
 
-}  // namespace TestAssembler
+}  // namespace test_assembler
 }  // namespace google_breakpad
 
 #endif  // PROCESSOR_TEST_ASSEMBLER_H_
