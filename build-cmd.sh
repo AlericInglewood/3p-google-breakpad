@@ -95,8 +95,6 @@ case "$AUTOBUILD_PLATFORM" in
     linux)
         VIEWER_FLAGS="-m32 -fno-stack-protector"
 
-        patch -p 1 < ./libdisasm_gcc41.patch
-
         if [ -f /usr/bin/gcc-4.1 ] ; then
             export CC=gcc-4.1
         else
