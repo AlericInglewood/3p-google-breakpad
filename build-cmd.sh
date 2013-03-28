@@ -97,7 +97,7 @@ case "$AUTOBUILD_PLATFORM" in
 
         patch -p 1 < ./libdisasm_gcc41.patch
 
-	if [ -f /usr/bin/gcc-4.1] ; then
+	if [ -f /usr/bin/gcc-4.1 ] ; then
 	   export CC=gcc-4.1
 	else
 	   export CC=gcc
