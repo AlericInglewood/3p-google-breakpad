@@ -97,10 +97,10 @@ case "$AUTOBUILD_PLATFORM" in
 	# Hack to force using g++ for CC as some of the code compiled as C uses namespaces...
 	#
 	if [[ -f /usr/bin/gcc-4.1 && -f /usr/bin/g++-4.1 ]] ; then
-	   export CC=g++-4.1
+	   export CC=g++-4.1 -c99
 	   export CXX=g++-4.1
 	else
-	   export CC=g++
+	   export CC="g++ -c99"
 	   export CXX=g++
 	fi
 
