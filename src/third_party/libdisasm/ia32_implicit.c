@@ -413,9 +413,9 @@ unsigned int ia32_insn_implicit_ops( x86_insn_t *insn, unsigned int impl_idx ) {
 		if (!op) {
 			return num;	/* gah! return early */
 		}
-		op->access |= access;
-		op->flags |= flags;
-		op->flags |= op_implied;
+		op->access = or_x86_op_access(op->access, access);
+		op->flags = or_x86_op_flags(op->flags, flags);
+		op->flags = or_x86_op_flags(op->flags, op_implied);
 	}
 	
 	return num;

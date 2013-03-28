@@ -97,34 +97,42 @@ case "$AUTOBUILD_PLATFORM" in
 
         patch -p 1 < ./libdisasm_gcc41.patch
 
-	if [ -f /usr/bin/gcc-4.1 ] ; then
-	   export CC=gcc-4.1
-	else
-	   export CC=gcc
-	fi
+        if [ -f /usr/bin/gcc-4.1 ] ; then
+            export CC=gcc-4.1
+        else
+            export CC=gcc
+        fi
 
-	if [ -f /usr/bin/g++-4.1 ] ; then
-	   export CXX=g++-4.1
-	else
-	   export CXX=g++
-	fi
+        if [ -f /usr/bin/g++-4.1 ] ; then
+            export CXX=gcc
+        else
+            export CXX=g++
+        fi
 
         ./configure --prefix="$(pwd)/stage" CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAGS=-m32
         make
         make -C src/tools/linux/dump_syms/ dump_syms
         make install
+
         mkdir -p "$INCLUDE_DIRECTORY/processor"
+        mkdir -p "$INCLUDE_DIRECTORY/common"
         mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
         mkdir -p "$INCLUDE_DIRECTORY/client/linux/handler"
         mkdir -p "$INCLUDE_DIRECTORY/client/linux/crash_generation"
-        cp -P stage/lib/libbreakpad*.a* "$LIBRARY_DIRECTORY_RELEASE"
+
         cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
-		cp ./src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY"
-		cp ./src/common/using_std_string.h "$INCLUDE_DIRECTORY"
-        cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation"
-        cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
+		cp src/common/using_std_string.h "$INCLUDE_DIRECTORY"
+
+        cp src/common/*.h "$INCLUDE_DIRECTORY/common"
+
+        cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation/"
+        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY/client/linux/handler/"
+
         cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
         cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
+
+        cp -P stage/lib/libbreakpad*.a* "$LIBRARY_DIRECTORY_RELEASE"
+        cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
     ;;
 esac
 mkdir -p "$INCLUDE_DIRECTORY/common"

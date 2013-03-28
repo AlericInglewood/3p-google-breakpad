@@ -19,17 +19,17 @@ static void apply_seg( x86_op_t *op, unsigned int prefixes ) {
 	/* apply overrides from prefix */
 	switch ( prefixes & PREFIX_REG_MASK ) {
 		case PREFIX_CS:
-			op->flags |= op_cs_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_cs_seg); break;
 		case PREFIX_SS:
-			op->flags |= op_ss_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_ss_seg); break;
 		case PREFIX_DS:
-			op->flags |= op_ds_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_ds_seg); break;
 		case PREFIX_ES:
-			op->flags |= op_es_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_es_seg); break;
 		case PREFIX_FS:
-			op->flags |= op_fs_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_fs_seg); break;
 		case PREFIX_GS:
-			op->flags |= op_gs_seg; break;
+			op->flags = or_x86_op_flags(op->flags, op_gs_seg); break;
 	}
 
 	return;
@@ -143,7 +143,7 @@ static size_t decode_operand_value( unsigned char *buf, size_t buf_len,
 			/* this fills op->data.near_offset or
 			   op->data.far_offset depending on the size of
 			   the operand */
-			op->flags |= op_signed;
+			op->flags = or_x86_op_flags(op->flags, op_signed);
 			if ( op_size == 1 ) {
 				/* one-byte near offset */
 				op->type = op_relative_near;
@@ -162,7 +162,7 @@ static size_t decode_operand_value( unsigned char *buf, size_t buf_len,
 			/* note bene: 'O' ADDR_METH uses addr_size  to
 			   determine operand size */
 			op->type = op_offset;
-			op->flags |= op_pointer;
+			op->flags = or_x86_op_flags(op->flags, op_pointer);
 			x86_imm_sized( buf, buf_len, &op->data.offset, 
 					insn->addr_size );
 
@@ -172,51 +172,49 @@ static size_t decode_operand_value( unsigned char *buf, size_t buf_len,
 		/* Hard-coded: these are specified in the insn definition */
 		case ADDRMETH_F:	/* EFLAGS register */
 			op->type = op_register;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			ia32_handle_register( &op->data.reg, REG_FLAGS_INDEX );
 			break;
 		case ADDRMETH_X:	/* Memory addressed by DS:SI [string] */
 			op->type = op_expression;
-			op->flags |= op_hardcode;
-			op->flags |= op_ds_seg | op_pointer | op_string;
+			op->flags = (enum x86_op_flags)(op->flags | op_hardcode | op_ds_seg | op_pointer | op_string);
 			ia32_handle_register( &op->data.expression.base, 
 					     REG_DWORD_OFFSET + 6 );
 			break;
 		case ADDRMETH_Y:	/* Memory addressed by ES:DI [string] */
 			op->type = op_expression;
-			op->flags |= op_hardcode;
-			op->flags |= op_es_seg | op_pointer | op_string;
+			op->flags = (enum x86_op_flags)(op->flags | op_hardcode | op_es_seg | op_pointer | op_string);
 			ia32_handle_register( &op->data.expression.base, 
 					     REG_DWORD_OFFSET + 7 );
 			break;
 		case ADDRMETH_RR:	/* Gen Register hard-coded in opcode */
 			op->type = op_register;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			ia32_handle_register( &op->data.reg, 
 						op_value + gen_regs );
 			break;
 		case ADDRMETH_RS:	/* Seg Register hard-coded in opcode */
 			op->type = op_register;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			ia32_handle_register( &op->data.reg, 
 						op_value + REG_SEG_OFFSET );
 			break;
 		case ADDRMETH_RF:	/* FPU Register hard-coded in opcode */
 			op->type = op_register;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			ia32_handle_register( &op->data.reg, 
 						op_value + REG_FPU_OFFSET );
 			break;
 		case ADDRMETH_RT:	/* TST Register hard-coded in opcode */
 			op->type = op_register;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			ia32_handle_register( &op->data.reg, 
 						op_value + REG_TEST_OFFSET );
 			break;
 		case ADDRMETH_II:	/* Immediate hard-coded in opcode */
 			op->type = op_immediate;
 			op->data.dword = op_value;
-			op->flags |= op_hardcode;
+			op->flags = or_x86_op_flags(op->flags, op_hardcode);
 			break;
 
 		case 0:	/* Operand is not used */

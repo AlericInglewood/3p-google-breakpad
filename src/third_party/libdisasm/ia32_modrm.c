@@ -155,12 +155,12 @@ static size_t modrm_decode16( unsigned char *buf, unsigned int buf_len,
 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 3);
 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 7);
 		case MOD16_RM_BPSI:
-			op->flags |= op_ss_seg;
+			op->flags = or_x86_op_flags(op->flags, op_ss_seg);
 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 5);
 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 6);
 			break;
 		case MOD16_RM_BPDI:
-			op->flags |= op_ss_seg;
+			op->flags = or_x86_op_flags(op->flags, op_ss_seg);
 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 5);
 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 7);
 			break;
@@ -172,7 +172,7 @@ static size_t modrm_decode16( unsigned char *buf, unsigned int buf_len,
 			break;
 		case MOD16_RM_BP:
 			if ( modrm->mod != MOD16_MOD_NODISP ) {
-				op->flags |= op_ss_seg;
+				op->flags = or_x86_op_flags(op->flags, op_ss_seg);
 				ia32_handle_register(&ea->base, 
 						     REG_WORD_OFFSET + 5);
 			}
@@ -229,7 +229,7 @@ size_t ia32_modrm_decode( unsigned char *buf, unsigned int buf_len,
 	/* then deal with cases where there is an effective address */
 	ea = &op->data.expression;
 	op->type = op_expression;
-	op->flags |= op_pointer;
+	op->flags = or_x86_op_flags(op->flags, op_pointer);
 
 	if ( insn->addr_size == 2 ) {
 		/* gah! 16 bit mode! */

@@ -90,7 +90,7 @@ static int ia32_invariant_modrm( unsigned char *in, unsigned char *out,
 	i = (unsigned int *)&out[1];
 
 	op->type = op_expression;
-	op->flags |= op_pointer;
+	op->flags = or_x86_op_flags(op->flags, op_pointer);
 	if ( ! mode_16 && modrm.rm == MODRM_RM_SIB && 
 			      modrm.mod != MODRM_MOD_NOEA ) {
 		size ++;
@@ -130,7 +130,7 @@ static int ia32_invariant_modrm( unsigned char *in, unsigned char *out,
 		}
 	} else if ( modrm.mod == 3 ) {
 		op->type = op_register;
-		op->flags &= ~op_pointer;
+		op->flags = (enum x86_op_flags)(op->flags & ~op_pointer);
 	}
 
 	return (size);
@@ -160,7 +160,7 @@ static int ia32_decode_invariant( unsigned char *buf, size_t buf_len,
 		inv->operands[x].access = (enum x86_op_access) 
 						OP_PERM(op_flags[x]);
 		inv->operands[x].flags = (enum x86_op_flags) 
-						(OP_FLAGS(op_flags[x]) >> 12);
+						(OP_FLAGS((enum x86_op_flags)(op_flags[x]) >> 12));
 
 		switch (op_flags[x] & OPTYPE_MASK) {
 			case OPTYPE_c:
@@ -221,8 +221,10 @@ static int ia32_decode_invariant( unsigned char *buf, size_t buf_len,
 				bytes += size;
 				inv->operands[x].type = op_offset;
 				if ( type == ADDRMETH_O ) {
-					inv->operands[x].flags |= op_signed |
-								  op_pointer;
+					inv->operands[x].flags = (enum x86_op_flags)(
+								  op_signed |
+								  op_pointer |
+								  inv->operands[x].flags);
 				}
 				break;
 			case ADDRMETH_I: case ADDRMETH_J:
@@ -245,7 +247,7 @@ static int ia32_decode_invariant( unsigned char *buf, size_t buf_len,
 						inv->operands[x].type = 
 							op_relative_far;
 					}
-					inv->operands[x].flags |= op_signed;
+					inv->operands[x].flags = or_x86_op_flags(inv->operands[x].flags, op_signed);
 				} else {
 					inv->operands[x].type = op_immediate;
 				}
@@ -254,12 +256,12 @@ static int ia32_decode_invariant( unsigned char *buf, size_t buf_len,
 				inv->operands[x].type = op_register;
 				break;
 			case ADDRMETH_X:
-				inv->operands[x].flags |= op_signed |
-					  op_pointer | op_ds_seg | op_string;
+				inv->operands[x].flags = (enum x86_op_flags)(op_signed |
+					  op_pointer | op_ds_seg | op_string | inv->operands[x].flags);
 				break;
 			case ADDRMETH_Y:
-				inv->operands[x].flags |= op_signed |
-					  op_pointer | op_es_seg | op_string;
+				inv->operands[x].flags = (enum x86_op_flags)(op_signed |
+					  op_pointer | op_es_seg | op_string | inv->operands[x].flags);
 				break;
 			case ADDRMETH_RR:	
 				inv->operands[x].type = op_register;
@@ -295,7 +297,7 @@ size_t ia32_disasm_invariant( unsigned char * buf, size_t buf_len,
 
 	/* set mnemonic type and group */
 	type = raw_insn->mnem_flag & ~INS_FLAG_MASK;
-        inv->group = (enum x86_insn_group) (INS_GROUP(type)) >> 12;
+        inv->group = (enum x86_insn_group)((INS_GROUP(type)) >> 12);
         inv->type = (enum x86_insn_type) INS_TYPE(type);
 
 	/* handle operands */

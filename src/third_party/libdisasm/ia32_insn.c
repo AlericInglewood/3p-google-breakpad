@@ -168,14 +168,14 @@ static void ia32_stack_mod(x86_insn_t *insn) {
 /* get the cpu details for this insn from cpu flags int */
 static void ia32_handle_cpu( x86_insn_t *insn, unsigned int cpu ) {
 	insn->cpu = (enum x86_insn_cpu) CPU_MODEL(cpu);
-	insn->isa = (enum x86_insn_isa) (ISA_SUBSET(cpu)) >> 16;
+	insn->isa = (enum x86_insn_isa) ((ISA_SUBSET(cpu)) >> 16);
 	return;
 }
 
 /* handle mnemonic type and group */
 static void ia32_handle_mnemtype(x86_insn_t *insn, unsigned int mnemtype) {
 	unsigned int type = mnemtype & ~INS_FLAG_MASK;
-        insn->group = (enum x86_insn_group) (INS_GROUP(type)) >> 12;
+        insn->group = (enum x86_insn_group) ((INS_GROUP(type)) >> 12);
         insn->type = (enum x86_insn_type) INS_TYPE(type);
 
 	return;
@@ -208,14 +208,14 @@ static void ia32_handle_eflags( x86_insn_t *insn, unsigned int eflags) {
         }
         insn->flags_tested = (enum x86_flag_status) flags;
 
-        insn->flags_set = (enum x86_flag_status) INS_FLAGS_SET(eflags) >> 16;
+        insn->flags_set = (enum x86_flag_status)( INS_FLAGS_SET(eflags) >> 16);
 
 	return;
 }
 
 static void ia32_handle_prefix( x86_insn_t *insn, unsigned int prefixes ) {
 
-        insn->prefix = (enum x86_insn_prefix) prefixes & PREFIX_MASK; // >> 20;
+        insn->prefix = (enum x86_insn_prefix)( prefixes & PREFIX_MASK); // >> 20;
         if (! (insn->prefix & PREFIX_PRINT_MASK) ) {
 		/* no printable prefixes */
                 insn->prefix = insn_no_prefix;

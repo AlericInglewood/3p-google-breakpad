@@ -1388,7 +1388,7 @@ int x86_format_insn( x86_insn_t *insn, char *buf, int len,
         } else { /* default to native */
                 /* NATIVE style: RVA\tBYTES\tMNEMONIC\tOPERANDS */
                 /* print address */
-                STRNCATF( buf, "%08" PRIX32 "\t", insn->addr, len );
+                STRNCATF( buf, "%08"PRIX32"\t", insn->addr, len );
 
                 /* print bytes */
                 for ( i = 0; i < insn->size; i++ ) {

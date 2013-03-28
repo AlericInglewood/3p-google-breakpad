@@ -28,6 +28,16 @@ extern "C" {
  * __________________________________________________________________________*/
 
 
+#define or_type(t,a,b) ((t)(a|b))
+
+#define or_x86_options(a,b) or_type(enum x86_options, (a), (b))
+#define or_x86_op_access(a,b) or_type(enum x86_op_access, (a), (b))
+#define or_x86_op_flags(a,b) or_type(enum x86_op_flags, (a), (b))
+#define or_x86_op_type(a,b) or_type(enum x86_op_type, (a), (b))
+#define or_x86_reg_type(a,b) or_type(enum x86_reg_type, (a), (b))
+#define or_x86_insn_prefix(a,b) or_type(enum x86_insn_prefix, (a), (b))
+#define or_x86_insn_isa(a,b) or_type(enum x86_insn_isa, (a), (b))
+
 /* ========================================= Error Reporting */
 /* REPORT CODES
  *      These are passed to a reporter function passed at initialization.
