@@ -1,4 +1,4 @@
-# Install script for directory: /Users/g/LL/3p-google-breakpad/src
+# Install script for directory: /Users/graham/LL/3p-google-breakpad/src
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,7 +29,7 @@ ENDIF(NOT CMAKE_INSTALL_COMPONENT)
 
 IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  INCLUDE("/Users/g/LL/3p-google-breakpad/src/client/mac/handler/cmake_install.cmake")
+  INCLUDE("/Users/graham/LL/3p-google-breakpad/src/client/mac/handler/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 
@@ -39,7 +39,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/Users/g/LL/3p-google-breakpad/src/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/Users/graham/LL/3p-google-breakpad/src/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/Users/g/LL/3p-google-breakpad/src/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/Users/graham/LL/3p-google-breakpad/src/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

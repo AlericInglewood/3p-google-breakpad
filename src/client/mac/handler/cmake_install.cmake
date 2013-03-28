@@ -1,4 +1,4 @@
-# Install script for directory: /Users/g/LL/3p-google-breakpad/src/client/mac/handler
+# Install script for directory: /Users/graham/LL/3p-google-breakpad/src/client/mac/handler
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -7,24 +7,24 @@
        objects = {
 
 /* Begin PBXAggregateTarget section */
-              78443EEB22284D0488949A78 /* ALL_BUILD */ = {
+              E1AEF23FBB0342FEA853DE8A /* ALL_BUILD */ = {
                      isa = PBXAggregateTarget;
-                     buildConfigurationList = B04A7CFF05BF4D0688D23680 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+                     buildConfigurationList = DA8EF86BAB83493BB1DECB72 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
                      buildPhases = (
-                            B3C34F964AB94E9D90DC84D1 /* CMake Rules */,
+                            998B055BA80D4890957EF990 /* CMake Rules */,
                      );
                      dependencies = (
-                            0AB99ED4A8054F6B89F2FE81 /* PBXTargetDependency */,
-                            15A5E199433547128C15427C /* PBXTargetDependency */,
+                            1BFA3DAE8E4E4D4CA78CC49A /* PBXTargetDependency */,
+                            25D079545E5C4E16AC5C6F5B /* PBXTargetDependency */,
                      );
                      name = ALL_BUILD;
                      productName = ALL_BUILD;
               };
-              709FD65CD048495EA9057B4A /* ZERO_CHECK */ = {
+              9B22F1E169CF468A8D7C28EA /* ZERO_CHECK */ = {
                      isa = PBXAggregateTarget;
-                     buildConfigurationList = 62F109D0E10E408F834BA4DD /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+                     buildConfigurationList = 85E6445479174FFBAE9126D7 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
                      buildPhases = (
-                            DFF8F555D4244E3484DA3E9E /* CMake Rules */,
+                            58F402F1FD8E424F8BB8A513 /* CMake Rules */,
                      );
                      dependencies = (
                      );
@@ -34,52 +34,52 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-47268C95EBE340ED8E29788B /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */ = {isa = PBXBuildFile; fileRef = ADE285DC69E8495F966DEC1F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */; settings = { COMPILER_FLAGS = ""; }; };
-D1BB2DC07D664E60B7E1BAFB /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */ = {isa = PBXBuildFile; fileRef = 49856F0FC7AA4885B7D883D5 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */; settings = { COMPILER_FLAGS = ""; }; };
-8790ACACD5554690AD232544 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */ = {isa = PBXBuildFile; fileRef = 73616A7B6A4543C398D6280D /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */; settings = { COMPILER_FLAGS = ""; }; };
-FCBEAE9D68E543F8833FF7AC /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */ = {isa = PBXBuildFile; fileRef = CCB6C39C304F4FA8B14D2666 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */; settings = { COMPILER_FLAGS = ""; }; };
-1F46C5E554014FC7AEB699C0 /* /Users/g/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */ = {isa = PBXBuildFile; fileRef = 74CC4D56CEA840609B40A35A /* /Users/g/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */; settings = { COMPILER_FLAGS = ""; }; };
-CECFB3355E024653BD81271B /* /Users/g/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */ = {isa = PBXBuildFile; fileRef = CB9B5862EE5A4C3E84929942 /* /Users/g/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */; settings = { COMPILER_FLAGS = ""; }; };
-9570A34839A34DDCA27ECA31 /* /Users/g/LL/3p-google-breakpad/src/common/convert_UTF.c */ = {isa = PBXBuildFile; fileRef = B9259D483C1A4BD4B16942C9 /* /Users/g/LL/3p-google-breakpad/src/common/convert_UTF.c */; settings = { COMPILER_FLAGS = ""; }; };
-7DA2644E53424606916042EA /* /Users/g/LL/3p-google-breakpad/src/common/string_conversion.cc */ = {isa = PBXBuildFile; fileRef = 998EFC3C40C844DBA5A98EB6 /* /Users/g/LL/3p-google-breakpad/src/common/string_conversion.cc */; settings = { COMPILER_FLAGS = ""; }; };
-14F6699CE33347E09EEE02AB /* /Users/g/LL/3p-google-breakpad/src/common/md5.cc */ = {isa = PBXBuildFile; fileRef = 975890988AF14B9CA7F05637 /* /Users/g/LL/3p-google-breakpad/src/common/md5.cc */; settings = { COMPILER_FLAGS = ""; }; };
-F82CE8DB26394337AE8FB353 /* /Users/g/LL/3p-google-breakpad/src/common/mac/file_id.cc */ = {isa = PBXBuildFile; fileRef = B0F34A79F46E4D8C9BEBE29C /* /Users/g/LL/3p-google-breakpad/src/common/mac/file_id.cc */; settings = { COMPILER_FLAGS = ""; }; };
-8FDF5EFBEB67428997C4CBC0 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_id.cc */ = {isa = PBXBuildFile; fileRef = DD49F8567C7946A0A234D6C4 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_id.cc */; settings = { COMPILER_FLAGS = ""; }; };
-C9FC5DF22D8E4FAA9C2864D7 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */ = {isa = PBXBuildFile; fileRef = 6593AFE1F5DA41BFA75F92EA /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */; settings = { COMPILER_FLAGS = ""; }; };
-E082A1F7A98C4C10B662FE8C /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */ = {isa = PBXBuildFile; fileRef = F3051801E9B34E3BB79D8656 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */; settings = { COMPILER_FLAGS = ""; }; };
-ABDC7D88205144CC979EF027 /* /Users/g/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */ = {isa = PBXBuildFile; fileRef = F72ADE88911A41BB976CE064 /* /Users/g/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */; settings = { COMPILER_FLAGS = ""; }; };
-4E51ADA9E0CB41309EA840E1 /* /Users/g/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */ = {isa = PBXBuildFile; fileRef = 035055EDFC04401CBE63BA7A /* /Users/g/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */; settings = { COMPILER_FLAGS = ""; }; };
-1CD40879624F4D5D98FBB94C /* /Users/g/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */ = {isa = PBXBuildFile; fileRef = D46C85ED34C44CBB9DA4FC67 /* /Users/g/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */; settings = { COMPILER_FLAGS = ""; }; };
-AEB4005CA4E0485F8A8656CB /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */ = {isa = PBXBuildFile; fileRef = 0AE93F929F344297A5FC9EE8 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */; settings = { COMPILER_FLAGS = ""; }; };
-B3DD2A3E09474118B5098393 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = DFC6B701A74C416DAE18B94F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */; settings = { COMPILER_FLAGS = ""; }; };
+841C5A81A8C3424CB4BB4BF3 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */ = {isa = PBXBuildFile; fileRef = 129C27B5F97C48CAB4780FC4 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */; settings = { COMPILER_FLAGS = ""; }; };
+8FE1808A48B941A19F73D5E5 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */ = {isa = PBXBuildFile; fileRef = AEAB409B5DAA4725882F236D /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */; settings = { COMPILER_FLAGS = ""; }; };
+88145A71677244609B2D9D84 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */ = {isa = PBXBuildFile; fileRef = 09CF09A52D454A17860CCA3C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */; settings = { COMPILER_FLAGS = ""; }; };
+989391946A6C488AAF04132F /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */ = {isa = PBXBuildFile; fileRef = 69CE176D72344ACDA1A446FD /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */; settings = { COMPILER_FLAGS = ""; }; };
+36A859E134604D2BA51F79BD /* /Users/graham/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */ = {isa = PBXBuildFile; fileRef = DDBC932B63FB447A8292A697 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */; settings = { COMPILER_FLAGS = ""; }; };
+A4988979A32E4ACAA9DAC0E9 /* /Users/graham/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */ = {isa = PBXBuildFile; fileRef = EBEF32BE9ECD47F1AB5A5668 /* /Users/graham/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */; settings = { COMPILER_FLAGS = ""; }; };
+FED9A90CB3A3429C844D151E /* /Users/graham/LL/3p-google-breakpad/src/common/convert_UTF.c */ = {isa = PBXBuildFile; fileRef = 242D0CA7EDE3492EA1E33FDB /* /Users/graham/LL/3p-google-breakpad/src/common/convert_UTF.c */; settings = { COMPILER_FLAGS = ""; }; };
+85D9B48A7096457791ABF1DB /* /Users/graham/LL/3p-google-breakpad/src/common/string_conversion.cc */ = {isa = PBXBuildFile; fileRef = CCC20AD257434B04AB2BA83E /* /Users/graham/LL/3p-google-breakpad/src/common/string_conversion.cc */; settings = { COMPILER_FLAGS = ""; }; };
+50416FC5CE904B6E8DF0E5E8 /* /Users/graham/LL/3p-google-breakpad/src/common/md5.cc */ = {isa = PBXBuildFile; fileRef = 44EB7F5C837343C0BD91E42A /* /Users/graham/LL/3p-google-breakpad/src/common/md5.cc */; settings = { COMPILER_FLAGS = ""; }; };
+21674F71518945188E95A7BC /* /Users/graham/LL/3p-google-breakpad/src/common/mac/file_id.cc */ = {isa = PBXBuildFile; fileRef = EF87B1C74A2A48A59ABC95B7 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/file_id.cc */; settings = { COMPILER_FLAGS = ""; }; };
+0FA7C4BC5347498E802FB683 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_id.cc */ = {isa = PBXBuildFile; fileRef = D980071B453843229D5A140A /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_id.cc */; settings = { COMPILER_FLAGS = ""; }; };
+187F81F3F09948CEAD3FE653 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */ = {isa = PBXBuildFile; fileRef = 8DDC3999A7A44DA8B0505818 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */; settings = { COMPILER_FLAGS = ""; }; };
+60B41B70B6704A8DB9C6B2D4 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */ = {isa = PBXBuildFile; fileRef = B55922AF69BC4086901B0166 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */; settings = { COMPILER_FLAGS = ""; }; };
+74A801F0E4D8487A856DFB9E /* /Users/graham/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */ = {isa = PBXBuildFile; fileRef = B9726C9D559643CDA02AEBC0 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */; settings = { COMPILER_FLAGS = ""; }; };
+10AEC56412884FFFA4E63CFD /* /Users/graham/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */ = {isa = PBXBuildFile; fileRef = 7C9DAB5CC7C34676A999B8F2 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */; settings = { COMPILER_FLAGS = ""; }; };
+88AC8813E5604824BCEEBF43 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */ = {isa = PBXBuildFile; fileRef = DBB99BD75D4C4AE7ADCA1499 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */; settings = { COMPILER_FLAGS = ""; }; };
+22B971C912654A7484049FF1 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */ = {isa = PBXBuildFile; fileRef = 741C1608BA5B4E79B949406C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */; settings = { COMPILER_FLAGS = ""; }; };
+D60461B082574333811F6B6B /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = 17923138AD674CDDA7373E0A /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */; settings = { COMPILER_FLAGS = ""; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
-              667A9981A7F24AE29B7203FE /*  */ = {
+              3D2DBE62300942E2996E5A92 /*  */ = {
                      isa = PBXBuildStyle;
               };
-              F0A7A8EADBD94625A021761D /* Debug */ = {
+              E02CFF501E5B4BDFBB9C5230 /* Debug */ = {
                      isa = PBXBuildStyle;
                      buildSettings = {
                             COPY_PHASE_STRIP = NO;
                      };
                      name = Debug;
               };
-              226D0174009046778BA30573 /* Release */ = {
+              9B03B073345E40308F6B029C /* Release */ = {
                      isa = PBXBuildStyle;
                      buildSettings = {
                             COPY_PHASE_STRIP = NO;
                      };
                      name = Release;
               };
-              1B58012F0BBD46A19B6EB786 /* MinSizeRel */ = {
+              992BDF45E8344CE4A28812F8 /* MinSizeRel */ = {
                      isa = PBXBuildStyle;
                      buildSettings = {
                             COPY_PHASE_STRIP = NO;
                      };
                      name = MinSizeRel;
               };
-              96958B03223441D6829CBE9E /* RelWithDebInfo */ = {
+              4BB2D34CB7DE4B8C89FEE4C7 /* RelWithDebInfo */ = {
                      isa = PBXBuildStyle;
                      buildSettings = {
                             COPY_PHASE_STRIP = NO;
@@ -89,149 +89,149 @@ B3DD2A3E09474118B5098393 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handle
 /* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
-              9C4274B4C43F4FEA9BF5843A /* PBXContainerItemProxy */ = {
+              4A70C9C5C4B74DBE901A6836 /* PBXContainerItemProxy */ = {
                      isa = PBXContainerItemProxy;
-                     containerPortal = 97A539281BCE456985830812 /* Project object */;
+                     containerPortal = 40DCA6E7B00545E8A38A4D0E /* Project object */;
                      proxyType = 1;
-                     remoteGlobalIDString = 709FD65CD048495EA9057B4A;
+                     remoteGlobalIDString = 9B22F1E169CF468A8D7C28EA;
                      remoteInfo = ZERO_CHECK;
               };
-              BFD2EC41BE2B4467B32B44A9 /* PBXContainerItemProxy */ = {
+              79890AB80C1E4092A79A829A /* PBXContainerItemProxy */ = {
                      isa = PBXContainerItemProxy;
-                     containerPortal = 97A539281BCE456985830812 /* Project object */;
+                     containerPortal = 40DCA6E7B00545E8A38A4D0E /* Project object */;
                      proxyType = 1;
-                     remoteGlobalIDString = F24074AD40D04692890D107E;
+                     remoteGlobalIDString = CB212566A9FE4517B52F319B;
                      remoteInfo = exception_handler;
               };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-F2484E958A1E4B54B87FC120 /* /Users/g/LL/3p-google-breakpad/src/CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text"; name = "CMakeLists.txt"; path = "CMakeLists.txt"; sourceTree = SOURCE_ROOT; };
-ADE285DC69E8495F966DEC1F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "breakpad_nlist_64.cc"; path = "client/mac/handler/breakpad_nlist_64.cc"; sourceTree = SOURCE_ROOT; };
-49856F0FC7AA4885B7D883D5 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "dynamic_images.cc"; path = "client/mac/handler/dynamic_images.cc"; sourceTree = SOURCE_ROOT; };
-73616A7B6A4543C398D6280D /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "exception_handler.cc"; path = "client/mac/handler/exception_handler.cc"; sourceTree = SOURCE_ROOT; };
-CCB6C39C304F4FA8B14D2666 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "minidump_generator.cc"; path = "client/mac/handler/minidump_generator.cc"; sourceTree = SOURCE_ROOT; };
-74CC4D56CEA840609B40A35A /* /Users/g/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "crash_generation_client.cc"; path = "client/mac/crash_generation/crash_generation_client.cc"; sourceTree = SOURCE_ROOT; };
-CB9B5862EE5A4C3E84929942 /* /Users/g/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "minidump_file_writer.cc"; path = "client/minidump_file_writer.cc"; sourceTree = SOURCE_ROOT; };
-B9259D483C1A4BD4B16942C9 /* /Users/g/LL/3p-google-breakpad/src/common/convert_UTF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.c.c"; name = "convert_UTF.c"; path = "common/convert_UTF.c"; sourceTree = SOURCE_ROOT; };
-998EFC3C40C844DBA5A98EB6 /* /Users/g/LL/3p-google-breakpad/src/common/string_conversion.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "string_conversion.cc"; path = "common/string_conversion.cc"; sourceTree = SOURCE_ROOT; };
-975890988AF14B9CA7F05637 /* /Users/g/LL/3p-google-breakpad/src/common/md5.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "md5.cc"; path = "common/md5.cc"; sourceTree = SOURCE_ROOT; };
-B0F34A79F46E4D8C9BEBE29C /* /Users/g/LL/3p-google-breakpad/src/common/mac/file_id.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "file_id.cc"; path = "common/mac/file_id.cc"; sourceTree = SOURCE_ROOT; };
-DD49F8567C7946A0A234D6C4 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_id.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_id.cc"; path = "common/mac/macho_id.cc"; sourceTree = SOURCE_ROOT; };
-6593AFE1F5DA41BFA75F92EA /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_utilities.cc"; path = "common/mac/macho_utilities.cc"; sourceTree = SOURCE_ROOT; };
-F3051801E9B34E3BB79D8656 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_walker.cc"; path = "common/mac/macho_walker.cc"; sourceTree = SOURCE_ROOT; };
-F72ADE88911A41BB976CE064 /* /Users/g/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "string_utilities.cc"; path = "common/mac/string_utilities.cc"; sourceTree = SOURCE_ROOT; };
-035055EDFC04401CBE63BA7A /* /Users/g/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.objcpp"; name = "MachIPC.mm"; path = "common/mac/MachIPC.mm"; sourceTree = SOURCE_ROOT; };
-D46C85ED34C44CBB9DA4FC67 /* /Users/g/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "bootstrap_compat.cc"; path = "common/mac/bootstrap_compat.cc"; sourceTree = SOURCE_ROOT; };
-0AE93F929F344297A5FC9EE8 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.c.h"; name = "exception_handler.h"; path = "client/mac/handler/exception_handler.h"; sourceTree = SOURCE_ROOT; };
-DFC6B701A74C416DAE18B94F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text"; name = "CMakeLists.txt"; path = "client/mac/handler/CMakeLists.txt"; sourceTree = SOURCE_ROOT; };
-7691DF2406E445508B7C4268 /* exception_handler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = "libexception_handler.dylib"; refType = 0; sourceTree = BUILT_PRODUCTS_DIR; };
+16AB95995FEE40F18BAC2016 /* /Users/graham/LL/3p-google-breakpad/src/CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text"; name = "CMakeLists.txt"; path = "CMakeLists.txt"; sourceTree = SOURCE_ROOT; };
+129C27B5F97C48CAB4780FC4 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "breakpad_nlist_64.cc"; path = "client/mac/handler/breakpad_nlist_64.cc"; sourceTree = SOURCE_ROOT; };
+AEAB409B5DAA4725882F236D /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "dynamic_images.cc"; path = "client/mac/handler/dynamic_images.cc"; sourceTree = SOURCE_ROOT; };
+09CF09A52D454A17860CCA3C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "exception_handler.cc"; path = "client/mac/handler/exception_handler.cc"; sourceTree = SOURCE_ROOT; };
+69CE176D72344ACDA1A446FD /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "minidump_generator.cc"; path = "client/mac/handler/minidump_generator.cc"; sourceTree = SOURCE_ROOT; };
+DDBC932B63FB447A8292A697 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "crash_generation_client.cc"; path = "client/mac/crash_generation/crash_generation_client.cc"; sourceTree = SOURCE_ROOT; };
+EBEF32BE9ECD47F1AB5A5668 /* /Users/graham/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "minidump_file_writer.cc"; path = "client/minidump_file_writer.cc"; sourceTree = SOURCE_ROOT; };
+242D0CA7EDE3492EA1E33FDB /* /Users/graham/LL/3p-google-breakpad/src/common/convert_UTF.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.c.c"; name = "convert_UTF.c"; path = "common/convert_UTF.c"; sourceTree = SOURCE_ROOT; };
+CCC20AD257434B04AB2BA83E /* /Users/graham/LL/3p-google-breakpad/src/common/string_conversion.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "string_conversion.cc"; path = "common/string_conversion.cc"; sourceTree = SOURCE_ROOT; };
+44EB7F5C837343C0BD91E42A /* /Users/graham/LL/3p-google-breakpad/src/common/md5.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "md5.cc"; path = "common/md5.cc"; sourceTree = SOURCE_ROOT; };
+EF87B1C74A2A48A59ABC95B7 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/file_id.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "file_id.cc"; path = "common/mac/file_id.cc"; sourceTree = SOURCE_ROOT; };
+D980071B453843229D5A140A /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_id.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_id.cc"; path = "common/mac/macho_id.cc"; sourceTree = SOURCE_ROOT; };
+8DDC3999A7A44DA8B0505818 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_utilities.cc"; path = "common/mac/macho_utilities.cc"; sourceTree = SOURCE_ROOT; };
+B55922AF69BC4086901B0166 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "macho_walker.cc"; path = "common/mac/macho_walker.cc"; sourceTree = SOURCE_ROOT; };
+B9726C9D559643CDA02AEBC0 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "string_utilities.cc"; path = "common/mac/string_utilities.cc"; sourceTree = SOURCE_ROOT; };
+7C9DAB5CC7C34676A999B8F2 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.objcpp"; name = "MachIPC.mm"; path = "common/mac/MachIPC.mm"; sourceTree = SOURCE_ROOT; };
+DBB99BD75D4C4AE7ADCA1499 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.cpp.cpp"; name = "bootstrap_compat.cc"; path = "common/mac/bootstrap_compat.cc"; sourceTree = SOURCE_ROOT; };
+741C1608BA5B4E79B949406C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.c.h"; name = "exception_handler.h"; path = "client/mac/handler/exception_handler.h"; sourceTree = SOURCE_ROOT; };
+17923138AD674CDDA7373E0A /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text"; name = "CMakeLists.txt"; path = "client/mac/handler/CMakeLists.txt"; sourceTree = SOURCE_ROOT; };
+1DF77C35B0E140F5B1E68491 /* exception_handler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = "libexception_handler.dylib"; refType = 0; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-              060D6E67F6114247B8F08A3D  = {
+              00A1F5BCD04C4C40A2486D64  = {
                      isa = PBXGroup;
                      children = (
-                            213DB631D0524876A94F7768 /* Sources */,
-                            C1F472ABB6424961BC906A8A /* Resources */,
-                            3007797A820F44078DEC9D0A /* Products */,
+                            F437BD2AE9B944DAAB10E270 /* Sources */,
+                            04C9465046F545C2842E4A58 /* Resources */,
+                            829E170AECA3411797BBEB23 /* Products */,
                      );
                      sourceTree = "<group>";
               };
-              213DB631D0524876A94F7768 /* Sources */ = {
+              F437BD2AE9B944DAAB10E270 /* Sources */ = {
                      isa = PBXGroup;
                      children = (
-                            885A6024A3B44C95906EE829 /* ALL_BUILD */,
-                            19F1BE6E195046C8A4C5BA6C /* ZERO_CHECK */,
-                            726E85074BE3446B98CC4837 /* exception_handler */,
+                            A528AFAA3B0A4E58B70E8D7B /* ALL_BUILD */,
+                            10AB22DF17AB4AF891BF7616 /* ZERO_CHECK */,
+                            79DDCE26BAB946BA8C6DF384 /* exception_handler */,
                      );
                      name = Sources;
                      sourceTree = "<group>";
               };
-              C1F472ABB6424961BC906A8A /* Resources */ = {
+              04C9465046F545C2842E4A58 /* Resources */ = {
                      isa = PBXGroup;
                      children = (
                      );
                      name = Resources;
                      sourceTree = "<group>";
               };
-              885A6024A3B44C95906EE829 /* ALL_BUILD */ = {
+              A528AFAA3B0A4E58B70E8D7B /* ALL_BUILD */ = {
                      isa = PBXGroup;
                      children = (
-                            2F52A15C55B740CB880F766B /* CMake Rules */,
-                            F2484E958A1E4B54B87FC120 /* /Users/g/LL/3p-google-breakpad/src/CMakeLists.txt */,
+                            FC4D047370944E3C85CBA4C8 /* CMake Rules */,
+                            16AB95995FEE40F18BAC2016 /* /Users/graham/LL/3p-google-breakpad/src/CMakeLists.txt */,
                      );
                      name = ALL_BUILD;
                      sourceTree = "<group>";
               };
-              2F52A15C55B740CB880F766B /* CMake Rules */ = {
+              FC4D047370944E3C85CBA4C8 /* CMake Rules */ = {
                      isa = PBXGroup;
                      children = (
                      );
                      name = "CMake Rules";
                      sourceTree = "<group>";
               };
-              19F1BE6E195046C8A4C5BA6C /* ZERO_CHECK */ = {
+              10AB22DF17AB4AF891BF7616 /* ZERO_CHECK */ = {
                      isa = PBXGroup;
                      children = (
-                            26D5A045ABA6419CB45F6AF7 /* CMake Rules */,
-                            F2484E958A1E4B54B87FC120 /* /Users/g/LL/3p-google-breakpad/src/CMakeLists.txt */,
+                            42BA91F5397B4169B9FBED3D /* CMake Rules */,
+                            16AB95995FEE40F18BAC2016 /* /Users/graham/LL/3p-google-breakpad/src/CMakeLists.txt */,
                      );
                      name = ZERO_CHECK;
                      sourceTree = "<group>";
               };
-              26D5A045ABA6419CB45F6AF7 /* CMake Rules */ = {
+              42BA91F5397B4169B9FBED3D /* CMake Rules */ = {
                      isa = PBXGroup;
                      children = (
                      );
                      name = "CMake Rules";
                      sourceTree = "<group>";
               };
-              726E85074BE3446B98CC4837 /* exception_handler */ = {
+              79DDCE26BAB946BA8C6DF384 /* exception_handler */ = {
                      isa = PBXGroup;
                      children = (
-                            9BA2499F16CC4097B81926FB /* Source Files */,
-                            F0E608A8760748A6B0486FA0 /* Header Files */,
-                            DFC6B701A74C416DAE18B94F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */,
+                            28CB350AD4644FE78DB270ED /* Source Files */,
+                            022B097767D04483B9C6AB64 /* Header Files */,
+                            17923138AD674CDDA7373E0A /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/CMakeLists.txt */,
                      );
                      name = exception_handler;
                      sourceTree = "<group>";
               };
-              9BA2499F16CC4097B81926FB /* Source Files */ = {
+              28CB350AD4644FE78DB270ED /* Source Files */ = {
                      isa = PBXGroup;
                      children = (
-                            ADE285DC69E8495F966DEC1F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */,
-                            49856F0FC7AA4885B7D883D5 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */,
-                            73616A7B6A4543C398D6280D /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */,
-                            CCB6C39C304F4FA8B14D2666 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */,
-                            74CC4D56CEA840609B40A35A /* /Users/g/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */,
-                            CB9B5862EE5A4C3E84929942 /* /Users/g/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */,
-                            B9259D483C1A4BD4B16942C9 /* /Users/g/LL/3p-google-breakpad/src/common/convert_UTF.c */,
-                            998EFC3C40C844DBA5A98EB6 /* /Users/g/LL/3p-google-breakpad/src/common/string_conversion.cc */,
-                            975890988AF14B9CA7F05637 /* /Users/g/LL/3p-google-breakpad/src/common/md5.cc */,
-                            B0F34A79F46E4D8C9BEBE29C /* /Users/g/LL/3p-google-breakpad/src/common/mac/file_id.cc */,
-                            DD49F8567C7946A0A234D6C4 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_id.cc */,
-                            6593AFE1F5DA41BFA75F92EA /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */,
-                            F3051801E9B34E3BB79D8656 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */,
-                            F72ADE88911A41BB976CE064 /* /Users/g/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */,
-                            035055EDFC04401CBE63BA7A /* /Users/g/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */,
-                            D46C85ED34C44CBB9DA4FC67 /* /Users/g/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */,
+                            129C27B5F97C48CAB4780FC4 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */,
+                            AEAB409B5DAA4725882F236D /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */,
+                            09CF09A52D454A17860CCA3C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */,
+                            69CE176D72344ACDA1A446FD /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */,
+                            DDBC932B63FB447A8292A697 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */,
+                            EBEF32BE9ECD47F1AB5A5668 /* /Users/graham/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */,
+                            242D0CA7EDE3492EA1E33FDB /* /Users/graham/LL/3p-google-breakpad/src/common/convert_UTF.c */,
+                            CCC20AD257434B04AB2BA83E /* /Users/graham/LL/3p-google-breakpad/src/common/string_conversion.cc */,
+                            44EB7F5C837343C0BD91E42A /* /Users/graham/LL/3p-google-breakpad/src/common/md5.cc */,
+                            EF87B1C74A2A48A59ABC95B7 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/file_id.cc */,
+                            D980071B453843229D5A140A /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_id.cc */,
+                            8DDC3999A7A44DA8B0505818 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */,
+                            B55922AF69BC4086901B0166 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */,
+                            B9726C9D559643CDA02AEBC0 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */,
+                            7C9DAB5CC7C34676A999B8F2 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */,
+                            DBB99BD75D4C4AE7ADCA1499 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */,
                      );
                      name = "Source Files";
                      sourceTree = "<group>";
               };
-              F0E608A8760748A6B0486FA0 /* Header Files */ = {
+              022B097767D04483B9C6AB64 /* Header Files */ = {
                      isa = PBXGroup;
                      children = (
-                            0AE93F929F344297A5FC9EE8 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */,
+                            741C1608BA5B4E79B949406C /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.h */,
                      );
                      name = "Header Files";
                      sourceTree = "<group>";
               };
-              3007797A820F44078DEC9D0A /* Products */ = {
+              829E170AECA3411797BBEB23 /* Products */ = {
                      isa = PBXGroup;
                      children = (
-                            7691DF2406E445508B7C4268 /* exception_handler */,
+                            1DF77C35B0E140F5B1E68491 /* exception_handler */,
                      );
                      name = Products;
                      sourceTree = "<group>";
@@ -239,55 +239,55 @@ DFC6B701A74C416DAE18B94F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handle
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-              F24074AD40D04692890D107E /* exception_handler */ = {
+              CB212566A9FE4517B52F319B /* exception_handler */ = {
                      isa = PBXNativeTarget;
-                     buildConfigurationList = 388B9AA6BC984DFD8AD5634A /* Build configuration list for PBXNativeTarget "exception_handler" */;
+                     buildConfigurationList = F8AF8B84C22E45CBA1483CC3 /* Build configuration list for PBXNativeTarget "exception_handler" */;
                      buildPhases = (
-                            F0793E5F192648B284DA97B2 /* Sources */,
-                            4F62A3D0A950423099E9C7ED /* CMake PostBuild Rules */,
+                            8726990B12004922A84B5563 /* Sources */,
+                            75C89DB2AC0A44B39662FAC3 /* CMake PostBuild Rules */,
                      );
                      buildRules = (
                      );
                      dependencies = (
-                            0AB99ED4A8054F6B89F2FE81 /* PBXTargetDependency */,
+                            1BFA3DAE8E4E4D4CA78CC49A /* PBXTargetDependency */,
                      );
                      name = exception_handler;
                      productName = exception_handler;
-                     productReference = 7691DF2406E445508B7C4268 /* exception_handler */;
+                     productReference = 1DF77C35B0E140F5B1E68491 /* exception_handler */;
                      productType = "com.apple.product-type.library.dynamic";
               };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-              97A539281BCE456985830812 /* Project object */ = {
+              40DCA6E7B00545E8A38A4D0E /* Project object */ = {
                      isa = PBXProject;
                      attributes = {
                             BuildIndependentTargetsInParallel = YES;
                      };
-                     buildConfigurationList = 351E1E2B60E4433D816C545C /* Build configuration list for PBXProject  "google_breakpad" */;
+                     buildConfigurationList = ACF5C91105C04EB1A6195C34 /* Build configuration list for PBXProject  "google_breakpad" */;
                      buildSettings = {
                      };
                      buildStyles = (
-                            F0A7A8EADBD94625A021761D /* Debug */,
-                            226D0174009046778BA30573 /* Release */,
-                            1B58012F0BBD46A19B6EB786 /* MinSizeRel */,
-                            96958B03223441D6829CBE9E /* RelWithDebInfo */,
+                            E02CFF501E5B4BDFBB9C5230 /* Debug */,
+                            9B03B073345E40308F6B029C /* Release */,
+                            992BDF45E8344CE4A28812F8 /* MinSizeRel */,
+                            4BB2D34CB7DE4B8C89FEE4C7 /* RelWithDebInfo */,
                      );
                      compatibilityVersion = "Xcode 3.2";
                      hasScannedForEncodings = 0;
-                     mainGroup = 060D6E67F6114247B8F08A3D;
+                     mainGroup = 00A1F5BCD04C4C40A2486D64;
                      projectDirPath = ".";
                      projectRoot = "";
                      targets = (
-                            78443EEB22284D0488949A78 /* ALL_BUILD */,
-                            709FD65CD048495EA9057B4A /* ZERO_CHECK */,
-                            F24074AD40D04692890D107E /* exception_handler */,
+                            E1AEF23FBB0342FEA853DE8A /* ALL_BUILD */,
+                            9B22F1E169CF468A8D7C28EA /* ZERO_CHECK */,
+                            CB212566A9FE4517B52F319B /* exception_handler */,
                      );
               };
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-              396029A9A60D431E80658A6B /*  */ = {
+              13019CD6376F41E2BAB44B02 /*  */ = {
                      isa = PBXShellScriptBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
@@ -302,7 +302,7 @@ DFC6B701A74C416DAE18B94F /* /Users/g/LL/3p-google-breakpad/src/client/mac/handle
 exit 0";
                      showEnvVarsInLog = 0;
               };
-              B3C34F964AB94E9D90DC84D1 /* CMake Rules */ = {
+              998B055BA80D4890957EF990 /* CMake Rules */ = {
                      isa = PBXShellScriptBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
@@ -310,10 +310,10 @@ exit 0";
                      name = "CMake Rules";
                      runOnlyForDeploymentPostprocessing = 0;
                      shellPath = /bin/sh;
-                     shellScript = "make -C /Users/g/LL/3p-google-breakpad/src -f /Users/g/LL/3p-google-breakpad/src/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION all";
+                     shellScript = "make -C /Users/graham/LL/3p-google-breakpad/src -f /Users/graham/LL/3p-google-breakpad/src/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION all";
                      showEnvVarsInLog = 0;
               };
-              2C1DF7B83BC9404AA33F1324 /*  */ = {
+              76F1A77033CB411A9DA3E463 /*  */ = {
                      isa = PBXShellScriptBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
@@ -328,7 +328,7 @@ exit 0";
 exit 0";
                      showEnvVarsInLog = 0;
               };
-              DFF8F555D4244E3484DA3E9E /* CMake Rules */ = {
+              58F402F1FD8E424F8BB8A513 /* CMake Rules */ = {
                      isa = PBXShellScriptBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
@@ -336,10 +336,10 @@ exit 0";
                      name = "CMake Rules";
                      runOnlyForDeploymentPostprocessing = 0;
                      shellPath = /bin/sh;
-                     shellScript = "make -C /Users/g/LL/3p-google-breakpad/src -f /Users/g/LL/3p-google-breakpad/src/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION all";
+                     shellScript = "make -C /Users/graham/LL/3p-google-breakpad/src -f /Users/graham/LL/3p-google-breakpad/src/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION all";
                      showEnvVarsInLog = 0;
               };
-              4F62A3D0A950423099E9C7ED /* CMake PostBuild Rules */ = {
+              75C89DB2AC0A44B39662FAC3 /* CMake PostBuild Rules */ = {
                      isa = PBXShellScriptBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
@@ -347,96 +347,96 @@ exit 0";
                      name = "CMake PostBuild Rules";
                      runOnlyForDeploymentPostprocessing = 0;
                      shellPath = /bin/sh;
-                     shellScript = "make -C /Users/g/LL/3p-google-breakpad/src/client/mac/handler -f /Users/g/LL/3p-google-breakpad/src/client/mac/handler/CMakeScripts/exception_handler_postBuildPhase.make$CONFIGURATION all";
+                     shellScript = "make -C /Users/graham/LL/3p-google-breakpad/src/client/mac/handler -f /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/CMakeScripts/exception_handler_postBuildPhase.make$CONFIGURATION all";
                      showEnvVarsInLog = 0;
               };
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-              F0793E5F192648B284DA97B2 /* Sources */ = {
+              8726990B12004922A84B5563 /* Sources */ = {
                      isa = PBXSourcesBuildPhase;
                      buildActionMask = 2147483647;
                      files = (
-                            47268C95EBE340ED8E29788B /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */,
-                            D1BB2DC07D664E60B7E1BAFB /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */,
-                            8790ACACD5554690AD232544 /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */,
-                            FCBEAE9D68E543F8833FF7AC /* /Users/g/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */,
-                            1F46C5E554014FC7AEB699C0 /* /Users/g/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */,
-                            CECFB3355E024653BD81271B /* /Users/g/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */,
-                            9570A34839A34DDCA27ECA31 /* /Users/g/LL/3p-google-breakpad/src/common/convert_UTF.c */,
-                            7DA2644E53424606916042EA /* /Users/g/LL/3p-google-breakpad/src/common/string_conversion.cc */,
-                            14F6699CE33347E09EEE02AB /* /Users/g/LL/3p-google-breakpad/src/common/md5.cc */,
-                            F82CE8DB26394337AE8FB353 /* /Users/g/LL/3p-google-breakpad/src/common/mac/file_id.cc */,
-                            8FDF5EFBEB67428997C4CBC0 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_id.cc */,
-                            C9FC5DF22D8E4FAA9C2864D7 /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */,
-                            E082A1F7A98C4C10B662FE8C /* /Users/g/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */,
-                            ABDC7D88205144CC979EF027 /* /Users/g/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */,
-                            4E51ADA9E0CB41309EA840E1 /* /Users/g/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */,
-                            1CD40879624F4D5D98FBB94C /* /Users/g/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */,
+                            841C5A81A8C3424CB4BB4BF3 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/breakpad_nlist_64.cc */,
+                            8FE1808A48B941A19F73D5E5 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/dynamic_images.cc */,
+                            88145A71677244609B2D9D84 /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/exception_handler.cc */,
+                            989391946A6C488AAF04132F /* /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/minidump_generator.cc */,
+                            36A859E134604D2BA51F79BD /* /Users/graham/LL/3p-google-breakpad/src/client/mac/crash_generation/crash_generation_client.cc */,
+                            A4988979A32E4ACAA9DAC0E9 /* /Users/graham/LL/3p-google-breakpad/src/client/minidump_file_writer.cc */,
+                            FED9A90CB3A3429C844D151E /* /Users/graham/LL/3p-google-breakpad/src/common/convert_UTF.c */,
+                            85D9B48A7096457791ABF1DB /* /Users/graham/LL/3p-google-breakpad/src/common/string_conversion.cc */,
+                            50416FC5CE904B6E8DF0E5E8 /* /Users/graham/LL/3p-google-breakpad/src/common/md5.cc */,
+                            21674F71518945188E95A7BC /* /Users/graham/LL/3p-google-breakpad/src/common/mac/file_id.cc */,
+                            0FA7C4BC5347498E802FB683 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_id.cc */,
+                            187F81F3F09948CEAD3FE653 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_utilities.cc */,
+                            60B41B70B6704A8DB9C6B2D4 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/macho_walker.cc */,
+                            74A801F0E4D8487A856DFB9E /* /Users/graham/LL/3p-google-breakpad/src/common/mac/string_utilities.cc */,
+                            10AEC56412884FFFA4E63CFD /* /Users/graham/LL/3p-google-breakpad/src/common/mac/MachIPC.mm */,
+                            88AC8813E5604824BCEEBF43 /* /Users/graham/LL/3p-google-breakpad/src/common/mac/bootstrap_compat.cc */,
                      );
                      runOnlyForDeploymentPostprocessing = 0;
               };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-              0AB99ED4A8054F6B89F2FE81 /* PBXTargetDependency */ = {
+              1BFA3DAE8E4E4D4CA78CC49A /* PBXTargetDependency */ = {
                      isa = PBXTargetDependency;
-                     target = 709FD65CD048495EA9057B4A /* ZERO_CHECK */;
-                     targetProxy = 9C4274B4C43F4FEA9BF5843A /* PBXContainerItemProxy */;
+                     target = 9B22F1E169CF468A8D7C28EA /* ZERO_CHECK */;
+                     targetProxy = 4A70C9C5C4B74DBE901A6836 /* PBXContainerItemProxy */;
               };
-              15A5E199433547128C15427C /* PBXTargetDependency */ = {
+              25D079545E5C4E16AC5C6F5B /* PBXTargetDependency */ = {
                      isa = PBXTargetDependency;
-                     target = F24074AD40D04692890D107E /* exception_handler */;
-                     targetProxy = BFD2EC41BE2B4467B32B44A9 /* PBXContainerItemProxy */;
+                     target = CB212566A9FE4517B52F319B /* exception_handler */;
+                     targetProxy = 79890AB80C1E4092A79A829A /* PBXContainerItemProxy */;
               };
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-              DB70F2DDF2BA4A9BB8DE17C6 /* Debug */ = {
+              F70077BDEFB440DA84792D4A /* Debug */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
                             GCC_VERSION = "com.apple.compilers.llvmgcc42";
                             MACOSX_DEPLOYMENT_TARGET = "10.6";
                             SDKROOT = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/build";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/build";
                      };
                      name = Debug;
               };
-              2F1BDBBF04F64FB08471855B /* Release */ = {
+              0B71BAADCEF84FE59B56CC13 /* Release */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
                             GCC_VERSION = "com.apple.compilers.llvmgcc42";
                             MACOSX_DEPLOYMENT_TARGET = "10.6";
                             SDKROOT = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/build";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/build";
                      };
                      name = Release;
               };
-              DCE4B8694D5E48AEB2820393 /* MinSizeRel */ = {
+              C25241BD607D4F5FB1486418 /* MinSizeRel */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
                             GCC_VERSION = "com.apple.compilers.llvmgcc42";
                             MACOSX_DEPLOYMENT_TARGET = "10.6";
                             SDKROOT = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/build";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/build";
                      };
                      name = MinSizeRel;
               };
-              124D4CBF93D74DF3BA039FFE /* RelWithDebInfo */ = {
+              4C2E0C2C90BB437CADAEEC3A /* RelWithDebInfo */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
                             GCC_VERSION = "com.apple.compilers.llvmgcc42";
                             MACOSX_DEPLOYMENT_TARGET = "10.6";
                             SDKROOT = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/build";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/build";
                      };
                      name = RelWithDebInfo;
               };
-              C6B22E311BA3479AAC6DF24B /* Debug */ = {
+              CEF3AE25A46D46CCB479FE5E /* Debug */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -452,101 +452,13 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = ALL_BUILD;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
-                            USE_HEADERMAP = NO;
-                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
-                     };
-                     name = Debug;
-              };
-              B4A7E5FD30684EE5B8ECF05A /* Release */ = {
-                     isa = XCBuildConfiguration;
-                     buildSettings = {
-                            ARCHS = i386;
-                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-                            GCC_OPTIMIZATION_LEVEL = 0;
-                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
-                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            INSTALL_PATH = "";
-                            ONLY_ACTIVE_ARCH = NO;
-                            OTHER_CFLAGS = "  ";
-                            OTHER_LDFLAGS = "";
-                            OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ALL_BUILD;
-                            SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
-                            USE_HEADERMAP = NO;
-                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
-                     };
-                     name = Release;
-              };
-              881D6B69F80D443F98C67135 /* MinSizeRel */ = {
-                     isa = XCBuildConfiguration;
-                     buildSettings = {
-                            ARCHS = i386;
-                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-                            GCC_OPTIMIZATION_LEVEL = 0;
-                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
-                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            INSTALL_PATH = "";
-                            ONLY_ACTIVE_ARCH = NO;
-                            OTHER_CFLAGS = "  ";
-                            OTHER_LDFLAGS = "";
-                            OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ALL_BUILD;
-                            SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
-                            USE_HEADERMAP = NO;
-                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
-                     };
-                     name = MinSizeRel;
-              };
-              B5DAE5DA10ED41FEB61CDBC3 /* RelWithDebInfo */ = {
-                     isa = XCBuildConfiguration;
-                     buildSettings = {
-                            ARCHS = i386;
-                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-                            GCC_OPTIMIZATION_LEVEL = 0;
-                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
-                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            INSTALL_PATH = "";
-                            ONLY_ACTIVE_ARCH = NO;
-                            OTHER_CFLAGS = "  ";
-                            OTHER_LDFLAGS = "";
-                            OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ALL_BUILD;
-                            SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
-                            USE_HEADERMAP = NO;
-                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
-                     };
-                     name = RelWithDebInfo;
-              };
-              BC4E1BEF21864B79A62C280F /* Debug */ = {
-                     isa = XCBuildConfiguration;
-                     buildSettings = {
-                            ARCHS = i386;
-                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-                            GCC_OPTIMIZATION_LEVEL = 0;
-                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
-                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            INSTALL_PATH = "";
-                            ONLY_ACTIVE_ARCH = NO;
-                            OTHER_CFLAGS = "  ";
-                            OTHER_LDFLAGS = "";
-                            OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ZERO_CHECK;
-                            SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = Debug;
               };
-              26DBCD6C5DB44DDEBF55FB85 /* Release */ = {
+              3426F82BAE614A3CB6D95A6E /* Release */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -560,15 +472,15 @@ exit 0";
                             OTHER_CFLAGS = "  ";
                             OTHER_LDFLAGS = "";
                             OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ZERO_CHECK;
+                            PRODUCT_NAME = ALL_BUILD;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = Release;
               };
-              59439A2BBD97473DA4D72707 /* MinSizeRel */ = {
+              88F212689F744E65BB953AFF /* MinSizeRel */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -582,15 +494,37 @@ exit 0";
                             OTHER_CFLAGS = "  ";
                             OTHER_LDFLAGS = "";
                             OTHER_REZFLAGS = "";
-                            PRODUCT_NAME = ZERO_CHECK;
+                            PRODUCT_NAME = ALL_BUILD;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = MinSizeRel;
               };
-              835D0B3B94D742A5A74D1EC8 /* RelWithDebInfo */ = {
+              EE3AFB125C3A42C58D167215 /* RelWithDebInfo */ = {
+                     isa = XCBuildConfiguration;
+                     buildSettings = {
+                            ARCHS = i386;
+                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+                            GCC_OPTIMIZATION_LEVEL = 0;
+                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
+                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+                            INSTALL_PATH = "";
+                            ONLY_ACTIVE_ARCH = NO;
+                            OTHER_CFLAGS = "  ";
+                            OTHER_LDFLAGS = "";
+                            OTHER_REZFLAGS = "";
+                            PRODUCT_NAME = ALL_BUILD;
+                            SECTORDER_FLAGS = "";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
+                            USE_HEADERMAP = NO;
+                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
+                     };
+                     name = RelWithDebInfo;
+              };
+              8E955B0ABE114105B322963C /* Debug */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -606,13 +540,79 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = ZERO_CHECK;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
+                            USE_HEADERMAP = NO;
+                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
+                     };
+                     name = Debug;
+              };
+              23B3C16A47E74F9D8D88E093 /* Release */ = {
+                     isa = XCBuildConfiguration;
+                     buildSettings = {
+                            ARCHS = i386;
+                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+                            GCC_OPTIMIZATION_LEVEL = 0;
+                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
+                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+                            INSTALL_PATH = "";
+                            ONLY_ACTIVE_ARCH = NO;
+                            OTHER_CFLAGS = "  ";
+                            OTHER_LDFLAGS = "";
+                            OTHER_REZFLAGS = "";
+                            PRODUCT_NAME = ZERO_CHECK;
+                            SECTORDER_FLAGS = "";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
+                            USE_HEADERMAP = NO;
+                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
+                     };
+                     name = Release;
+              };
+              3B96F32F4C2F4A6B87986CB2 /* MinSizeRel */ = {
+                     isa = XCBuildConfiguration;
+                     buildSettings = {
+                            ARCHS = i386;
+                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+                            GCC_OPTIMIZATION_LEVEL = 0;
+                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
+                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+                            INSTALL_PATH = "";
+                            ONLY_ACTIVE_ARCH = NO;
+                            OTHER_CFLAGS = "  ";
+                            OTHER_LDFLAGS = "";
+                            OTHER_REZFLAGS = "";
+                            PRODUCT_NAME = ZERO_CHECK;
+                            SECTORDER_FLAGS = "";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
+                            USE_HEADERMAP = NO;
+                            WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
+                     };
+                     name = MinSizeRel;
+              };
+              FA825AF67C6C44BF9E328ED4 /* RelWithDebInfo */ = {
+                     isa = XCBuildConfiguration;
+                     buildSettings = {
+                            ARCHS = i386;
+                            GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+                            GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+                            GCC_OPTIMIZATION_LEVEL = 0;
+                            GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", );
+                            GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+                            INSTALL_PATH = "";
+                            ONLY_ACTIVE_ARCH = NO;
+                            OTHER_CFLAGS = "  ";
+                            OTHER_LDFLAGS = "";
+                            OTHER_REZFLAGS = "";
+                            PRODUCT_NAME = ZERO_CHECK;
+                            SECTORDER_FLAGS = "";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = RelWithDebInfo;
               };
-              F364E1AE796D416FA24001A8 /* Debug */ = {
+              90036A567153487BB61A9B1F /* Debug */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -625,7 +625,7 @@ exit 0";
                             GCC_OPTIMIZATION_LEVEL = 0;
                             GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", exception_handler_EXPORTS, );
                             GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            HEADER_SEARCH_PATHS = ("/Users/g/LL/3p-google-breakpad/src/common", "/Users/g/LL/3p-google-breakpad/src/common/mac", "/Users/g/LL/3p-google-breakpad/src/client", "/Users/g/LL/3p-google-breakpad/src/client/mac/handler", "/Users/g/LL/3p-google-breakpad/src", );
+                            HEADER_SEARCH_PATHS = ("/Users/graham/LL/3p-google-breakpad/src/common", "/Users/graham/LL/3p-google-breakpad/src/common/mac", "/Users/graham/LL/3p-google-breakpad/src/client", "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler", "/Users/graham/LL/3p-google-breakpad/src", );
                             INSTALL_PATH = "@executable_path/../Resources";
                             LIBRARY_SEARCH_PATHS = "";
                             LIBRARY_STYLE = DYNAMIC;
@@ -636,13 +636,13 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = exception_handler;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/client/mac/handler";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = Debug;
               };
-              08672A01907648DEA06A5525 /* Release */ = {
+              F4FF8B4613C54853A2FEF4B1 /* Release */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -655,7 +655,7 @@ exit 0";
                             GCC_OPTIMIZATION_LEVEL = 3;
                             GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", exception_handler_EXPORTS, );
                             GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            HEADER_SEARCH_PATHS = ("/Users/g/LL/3p-google-breakpad/src/common", "/Users/g/LL/3p-google-breakpad/src/common/mac", "/Users/g/LL/3p-google-breakpad/src/client", "/Users/g/LL/3p-google-breakpad/src/client/mac/handler", "/Users/g/LL/3p-google-breakpad/src", );
+                            HEADER_SEARCH_PATHS = ("/Users/graham/LL/3p-google-breakpad/src/common", "/Users/graham/LL/3p-google-breakpad/src/common/mac", "/Users/graham/LL/3p-google-breakpad/src/client", "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler", "/Users/graham/LL/3p-google-breakpad/src", );
                             INSTALL_PATH = "@executable_path/../Resources";
                             LIBRARY_SEARCH_PATHS = "";
                             LIBRARY_STYLE = DYNAMIC;
@@ -666,13 +666,13 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = exception_handler;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/client/mac/handler";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = Release;
               };
-              24DB6C59FEDF45F8A9B686B3 /* MinSizeRel */ = {
+              6CE06224697B469BBE6D5D39 /* MinSizeRel */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -685,7 +685,7 @@ exit 0";
                             GCC_OPTIMIZATION_LEVEL = s;
                             GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", exception_handler_EXPORTS, );
                             GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            HEADER_SEARCH_PATHS = ("/Users/g/LL/3p-google-breakpad/src/common", "/Users/g/LL/3p-google-breakpad/src/common/mac", "/Users/g/LL/3p-google-breakpad/src/client", "/Users/g/LL/3p-google-breakpad/src/client/mac/handler", "/Users/g/LL/3p-google-breakpad/src", );
+                            HEADER_SEARCH_PATHS = ("/Users/graham/LL/3p-google-breakpad/src/common", "/Users/graham/LL/3p-google-breakpad/src/common/mac", "/Users/graham/LL/3p-google-breakpad/src/client", "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler", "/Users/graham/LL/3p-google-breakpad/src", );
                             INSTALL_PATH = "@executable_path/../Resources";
                             LIBRARY_SEARCH_PATHS = "";
                             LIBRARY_STYLE = DYNAMIC;
@@ -696,13 +696,13 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = exception_handler;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/client/mac/handler";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
                      name = MinSizeRel;
               };
-              5B404975179E40C5A4A19BEA /* RelWithDebInfo */ = {
+              BEE6AF5B87E845D59D4495DE /* RelWithDebInfo */ = {
                      isa = XCBuildConfiguration;
                      buildSettings = {
                             ARCHS = i386;
@@ -715,7 +715,7 @@ exit 0";
                             GCC_OPTIMIZATION_LEVEL = 2;
                             GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'", exception_handler_EXPORTS, );
                             GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-                            HEADER_SEARCH_PATHS = ("/Users/g/LL/3p-google-breakpad/src/common", "/Users/g/LL/3p-google-breakpad/src/common/mac", "/Users/g/LL/3p-google-breakpad/src/client", "/Users/g/LL/3p-google-breakpad/src/client/mac/handler", "/Users/g/LL/3p-google-breakpad/src", );
+                            HEADER_SEARCH_PATHS = ("/Users/graham/LL/3p-google-breakpad/src/common", "/Users/graham/LL/3p-google-breakpad/src/common/mac", "/Users/graham/LL/3p-google-breakpad/src/client", "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler", "/Users/graham/LL/3p-google-breakpad/src", );
                             INSTALL_PATH = "@executable_path/../Resources";
                             LIBRARY_SEARCH_PATHS = "";
                             LIBRARY_STYLE = DYNAMIC;
@@ -726,7 +726,7 @@ exit 0";
                             OTHER_REZFLAGS = "";
                             PRODUCT_NAME = exception_handler;
                             SECTORDER_FLAGS = "";
-                            SYMROOT = "/Users/g/LL/3p-google-breakpad/src/client/mac/handler";
+                            SYMROOT = "/Users/graham/LL/3p-google-breakpad/src/client/mac/handler";
                             USE_HEADERMAP = NO;
                             WARNING_CFLAGS = ("-Wmost", "-Wno-four-char-constants", "-Wno-unknown-pragmas", );
                      };
@@ -735,51 +735,51 @@ exit 0";
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-              351E1E2B60E4433D816C545C /* Build configuration list for PBXProject  "google_breakpad" */ = {
+              ACF5C91105C04EB1A6195C34 /* Build configuration list for PBXProject  "google_breakpad" */ = {
                      isa = XCConfigurationList;
                      buildConfigurations = (
-                            DB70F2DDF2BA4A9BB8DE17C6 /* Debug */,
-                            2F1BDBBF04F64FB08471855B /* Release */,
-                            DCE4B8694D5E48AEB2820393 /* MinSizeRel */,
-                            124D4CBF93D74DF3BA039FFE /* RelWithDebInfo */,
+                            F70077BDEFB440DA84792D4A /* Debug */,
+                            0B71BAADCEF84FE59B56CC13 /* Release */,
+                            C25241BD607D4F5FB1486418 /* MinSizeRel */,
+                            4C2E0C2C90BB437CADAEEC3A /* RelWithDebInfo */,
                      );
                      defaultConfigurationIsVisible = 0;
                      defaultConfigurationName = Debug;
               };
-              B04A7CFF05BF4D0688D23680 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+              DA8EF86BAB83493BB1DECB72 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
                      isa = XCConfigurationList;
                      buildConfigurations = (
-                            C6B22E311BA3479AAC6DF24B /* Debug */,
-                            B4A7E5FD30684EE5B8ECF05A /* Release */,
-                            881D6B69F80D443F98C67135 /* MinSizeRel */,
-                            B5DAE5DA10ED41FEB61CDBC3 /* RelWithDebInfo */,
+                            CEF3AE25A46D46CCB479FE5E /* Debug */,
+                            3426F82BAE614A3CB6D95A6E /* Release */,
+                            88F212689F744E65BB953AFF /* MinSizeRel */,
+                            EE3AFB125C3A42C58D167215 /* RelWithDebInfo */,
                      );
                      defaultConfigurationIsVisible = 0;
                      defaultConfigurationName = Debug;
               };
-              62F109D0E10E408F834BA4DD /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+              85E6445479174FFBAE9126D7 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
                      isa = XCConfigurationList;
                      buildConfigurations = (
-                            BC4E1BEF21864B79A62C280F /* Debug */,
-                            26DBCD6C5DB44DDEBF55FB85 /* Release */,
-                            59439A2BBD97473DA4D72707 /* MinSizeRel */,
-                            835D0B3B94D742A5A74D1EC8 /* RelWithDebInfo */,
+                            8E955B0ABE114105B322963C /* Debug */,
+                            23B3C16A47E74F9D8D88E093 /* Release */,
+                            3B96F32F4C2F4A6B87986CB2 /* MinSizeRel */,
+                            FA825AF67C6C44BF9E328ED4 /* RelWithDebInfo */,
                      );
                      defaultConfigurationIsVisible = 0;
                      defaultConfigurationName = Debug;
               };
-              388B9AA6BC984DFD8AD5634A /* Build configuration list for PBXNativeTarget "exception_handler" */ = {
+              F8AF8B84C22E45CBA1483CC3 /* Build configuration list for PBXNativeTarget "exception_handler" */ = {
                      isa = XCConfigurationList;
                      buildConfigurations = (
-                            F364E1AE796D416FA24001A8 /* Debug */,
-                            08672A01907648DEA06A5525 /* Release */,
-                            24DB6C59FEDF45F8A9B686B3 /* MinSizeRel */,
-                            5B404975179E40C5A4A19BEA /* RelWithDebInfo */,
+                            90036A567153487BB61A9B1F /* Debug */,
+                            F4FF8B4613C54853A2FEF4B1 /* Release */,
+                            6CE06224697B469BBE6D5D39 /* MinSizeRel */,
+                            BEE6AF5B87E845D59D4495DE /* RelWithDebInfo */,
                      );
                      defaultConfigurationIsVisible = 0;
                      defaultConfigurationName = Debug;
               };
 /* End XCConfigurationList section */
        };
-       rootObject = 97A539281BCE456985830812;
+       rootObject = 40DCA6E7B00545E8A38A4D0E;
 }

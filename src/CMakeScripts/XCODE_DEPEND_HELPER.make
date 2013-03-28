@@ -11,22 +11,22 @@ default:
 # link.  This forces Xcode to relink the targets from scratch.  It
 # does not seem to check these dependencies itself.
 PostBuild.exception_handler.Debug:
-/Users/g/LL/3p-google-breakpad/src/client/mac/handler/Debug/libexception_handler.dylib:
-	/bin/rm -f /Users/g/LL/3p-google-breakpad/src/client/mac/handler/Debug/libexception_handler.dylib
+/Users/graham/LL/3p-google-breakpad/src/client/mac/handler/Debug/libexception_handler.dylib:
+	/bin/rm -f /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/Debug/libexception_handler.dylib
 
 
 PostBuild.exception_handler.Release:
-/Users/g/LL/3p-google-breakpad/src/client/mac/handler/Release/libexception_handler.dylib:
-	/bin/rm -f /Users/g/LL/3p-google-breakpad/src/client/mac/handler/Release/libexception_handler.dylib
+/Users/graham/LL/3p-google-breakpad/src/client/mac/handler/Release/libexception_handler.dylib:
+	/bin/rm -f /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/Release/libexception_handler.dylib
 
 
 PostBuild.exception_handler.MinSizeRel:
-/Users/g/LL/3p-google-breakpad/src/client/mac/handler/MinSizeRel/libexception_handler.dylib:
-	/bin/rm -f /Users/g/LL/3p-google-breakpad/src/client/mac/handler/MinSizeRel/libexception_handler.dylib
+/Users/graham/LL/3p-google-breakpad/src/client/mac/handler/MinSizeRel/libexception_handler.dylib:
+	/bin/rm -f /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/MinSizeRel/libexception_handler.dylib
 
 
 PostBuild.exception_handler.RelWithDebInfo:
-/Users/g/LL/3p-google-breakpad/src/client/mac/handler/RelWithDebInfo/libexception_handler.dylib:
-	/bin/rm -f /Users/g/LL/3p-google-breakpad/src/client/mac/handler/RelWithDebInfo/libexception_handler.dylib
+/Users/graham/LL/3p-google-breakpad/src/client/mac/handler/RelWithDebInfo/libexception_handler.dylib:
+	/bin/rm -f /Users/graham/LL/3p-google-breakpad/src/client/mac/handler/RelWithDebInfo/libexception_handler.dylib
 
 

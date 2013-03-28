@@ -2,9 +2,9 @@
 # Custom rules for ZERO_CHECK
 .SUFFIXES: 
 all: \
-	/Users/g/LL/3p-google-breakpad/src/CMakeFiles/ZERO_CHECK
+	/Users/graham/LL/3p-google-breakpad/src/CMakeFiles/ZERO_CHECK
 
 
-/Users/g/LL/3p-google-breakpad/src/CMakeFiles/ZERO_CHECK: 
+/Users/graham/LL/3p-google-breakpad/src/CMakeFiles/ZERO_CHECK: 
 	echo ""
-	make -f /Users/g/LL/3p-google-breakpad/src/CMakeScripts/ReRunCMake.make
+	make -f /Users/graham/LL/3p-google-breakpad/src/CMakeScripts/ReRunCMake.make
