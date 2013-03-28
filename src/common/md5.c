@@ -21,7 +21,9 @@
 typedef uint32_t u32;
 typedef uint8_t u8;
 
+#if __cplusplus
 using namespace google_breakpad;
+#endif
 
 #ifndef WORDS_BIGENDIAN
 #define byteReverse(buf, len)   /* Nothing */

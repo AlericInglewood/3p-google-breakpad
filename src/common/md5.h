@@ -3,7 +3,9 @@
 #ifndef COMMON_MD5_H__
 #define COMMON_MD5_H__
 
+#if __cplusplus
 namespace google_breakpad {
+#endif
 
 struct MD5Context {
   unsigned int buf[4];
@@ -17,6 +19,8 @@ void MD5Update(struct MD5Context *ctx, unsigned char const *buf, unsigned len);
 
 void MD5Final(unsigned char digest[16], struct MD5Context *ctx);
 
+#if __cplusplus
 }  // namespace google_breakpad
+#endif
 
 #endif  // COMMON_MD5_H__

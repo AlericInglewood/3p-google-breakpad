@@ -75,6 +75,7 @@ case "$AUTOBUILD_PLATFORM" in
     darwin)
         (
             cd src/
+	    rm CMakeCache.txt
             cmake -G Xcode CMakeLists.txt
             xcodebuild -arch i386 -project google_breakpad.xcodeproj -configuration Release
         )
@@ -94,13 +95,17 @@ case "$AUTOBUILD_PLATFORM" in
     linux)
         VIEWER_FLAGS="-m32 -fno-stack-protector"
 
-	# Hack to force using g++ for CC as some of the code compiled as C uses namespaces...
-	#
-	if [[ -f /usr/bin/gcc-4.1 && -f /usr/bin/g++-4.1 ]] ; then
-	   export CC=g++-4.1
+        patch -p 1 < ./libdisasm_gcc41.patch
+
+	if [ -f /usr/bin/gcc-4.1] ; then
+	   export CC=gcc-4.1
+	else
+	   export CC=gcc
+	fi
+
+	if [ -f /usr/bin/g++-4.1 ] ; then
 	   export CXX=g++-4.1
 	else
-	   export CC=g++
 	   export CXX=g++
 	fi
 

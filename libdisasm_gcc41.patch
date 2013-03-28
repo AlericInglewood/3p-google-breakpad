@@ -1,0 +1,558 @@
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_implicit.c
+--- a/src/third_party/libdisasm/ia32_implicit.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_implicit.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -413,9 +413,9 @@
+ 		if (!op) {
+ 			return num;	/* gah! return early */
+ 		}
+-		op->access |= access;
+-		op->flags |= flags;
+-		op->flags |= op_implied;
++		op->access = or_x86_op_access(op->access, access);
++		op->flags = or_x86_op_flags(op->flags, flags);
++		op->flags = or_x86_op_flags(op->flags, op_implied);
+ 	}
+ 	
+ 	return num;
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_insn.c
+--- a/src/third_party/libdisasm/ia32_insn.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_insn.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -168,14 +168,14 @@
+ /* get the cpu details for this insn from cpu flags int */
+ static void ia32_handle_cpu( x86_insn_t *insn, unsigned int cpu ) {
+ 	insn->cpu = (enum x86_insn_cpu) CPU_MODEL(cpu);
+-	insn->isa = (enum x86_insn_isa) (ISA_SUBSET(cpu)) >> 16;
++	insn->isa = (enum x86_insn_isa) ((ISA_SUBSET(cpu)) >> 16);
+ 	return;
+ }
+ 
+ /* handle mnemonic type and group */
+ static void ia32_handle_mnemtype(x86_insn_t *insn, unsigned int mnemtype) {
+ 	unsigned int type = mnemtype & ~INS_FLAG_MASK;
+-        insn->group = (enum x86_insn_group) (INS_GROUP(type)) >> 12;
++        insn->group = (enum x86_insn_group) ((INS_GROUP(type)) >> 12);
+         insn->type = (enum x86_insn_type) INS_TYPE(type);
+ 
+ 	return;
+@@ -208,14 +208,14 @@
+         }
+         insn->flags_tested = (enum x86_flag_status) flags;
+ 
+-        insn->flags_set = (enum x86_flag_status) INS_FLAGS_SET(eflags) >> 16;
++        insn->flags_set = (enum x86_flag_status)( INS_FLAGS_SET(eflags) >> 16);
+ 
+ 	return;
+ }
+ 
+ static void ia32_handle_prefix( x86_insn_t *insn, unsigned int prefixes ) {
+ 
+-        insn->prefix = (enum x86_insn_prefix) prefixes & PREFIX_MASK; // >> 20;
++        insn->prefix = (enum x86_insn_prefix)( prefixes & PREFIX_MASK); // >> 20;
+         if (! (insn->prefix & PREFIX_PRINT_MASK) ) {
+ 		/* no printable prefixes */
+                 insn->prefix = insn_no_prefix;
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_invariant.c
+--- a/src/third_party/libdisasm/ia32_invariant.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_invariant.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -90,7 +90,7 @@
+ 	i = (unsigned int *)&out[1];
+ 
+ 	op->type = op_expression;
+-	op->flags |= op_pointer;
++	op->flags = or_x86_op_flags(op->flags, op_pointer);
+ 	if ( ! mode_16 && modrm.rm == MODRM_RM_SIB && 
+ 			      modrm.mod != MODRM_MOD_NOEA ) {
+ 		size ++;
+@@ -130,7 +130,7 @@
+ 		}
+ 	} else if ( modrm.mod == 3 ) {
+ 		op->type = op_register;
+-		op->flags &= ~op_pointer;
++		op->flags = (enum x86_op_flags)(op->flags & ~op_pointer);
+ 	}
+ 
+ 	return (size);
+@@ -160,7 +160,7 @@
+ 		inv->operands[x].access = (enum x86_op_access) 
+ 						OP_PERM(op_flags[x]);
+ 		inv->operands[x].flags = (enum x86_op_flags) 
+-						(OP_FLAGS(op_flags[x]) >> 12);
++						(OP_FLAGS((enum x86_op_flags)(op_flags[x]) >> 12));
+ 
+ 		switch (op_flags[x] & OPTYPE_MASK) {
+ 			case OPTYPE_c:
+@@ -221,8 +221,10 @@
+ 				bytes += size;
+ 				inv->operands[x].type = op_offset;
+ 				if ( type == ADDRMETH_O ) {
+-					inv->operands[x].flags |= op_signed |
+-								  op_pointer;
++					inv->operands[x].flags = (enum x86_op_flags)(
++								  op_signed |
++								  op_pointer |
++								  inv->operands[x].flags);
+ 				}
+ 				break;
+ 			case ADDRMETH_I: case ADDRMETH_J:
+@@ -245,7 +247,7 @@
+ 						inv->operands[x].type = 
+ 							op_relative_far;
+ 					}
+-					inv->operands[x].flags |= op_signed;
++					inv->operands[x].flags = or_x86_op_flags(inv->operands[x].flags, op_signed);
+ 				} else {
+ 					inv->operands[x].type = op_immediate;
+ 				}
+@@ -254,12 +256,12 @@
+ 				inv->operands[x].type = op_register;
+ 				break;
+ 			case ADDRMETH_X:
+-				inv->operands[x].flags |= op_signed |
+-					  op_pointer | op_ds_seg | op_string;
++				inv->operands[x].flags = (enum x86_op_flags)(op_signed |
++					  op_pointer | op_ds_seg | op_string | inv->operands[x].flags);
+ 				break;
+ 			case ADDRMETH_Y:
+-				inv->operands[x].flags |= op_signed |
+-					  op_pointer | op_es_seg | op_string;
++				inv->operands[x].flags = (enum x86_op_flags)(op_signed |
++					  op_pointer | op_es_seg | op_string | inv->operands[x].flags);
+ 				break;
+ 			case ADDRMETH_RR:	
+ 				inv->operands[x].type = op_register;
+@@ -295,7 +297,7 @@
+ 
+ 	/* set mnemonic type and group */
+ 	type = raw_insn->mnem_flag & ~INS_FLAG_MASK;
+-        inv->group = (enum x86_insn_group) (INS_GROUP(type)) >> 12;
++        inv->group = (enum x86_insn_group)((INS_GROUP(type)) >> 12);
+         inv->type = (enum x86_insn_type) INS_TYPE(type);
+ 
+ 	/* handle operands */
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_modrm.c
+--- a/src/third_party/libdisasm/ia32_modrm.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_modrm.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -155,12 +155,12 @@
+ 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 3);
+ 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 7);
+ 		case MOD16_RM_BPSI:
+-			op->flags |= op_ss_seg;
++			op->flags = or_x86_op_flags(op->flags, op_ss_seg);
+ 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 5);
+ 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 6);
+ 			break;
+ 		case MOD16_RM_BPDI:
+-			op->flags |= op_ss_seg;
++			op->flags = or_x86_op_flags(op->flags, op_ss_seg);
+ 			ia32_handle_register(&ea->base, REG_WORD_OFFSET + 5);
+ 			ia32_handle_register(&ea->index, REG_WORD_OFFSET + 7);
+ 			break;
+@@ -172,7 +172,7 @@
+ 			break;
+ 		case MOD16_RM_BP:
+ 			if ( modrm->mod != MOD16_MOD_NODISP ) {
+-				op->flags |= op_ss_seg;
++				op->flags = or_x86_op_flags(op->flags, op_ss_seg);
+ 				ia32_handle_register(&ea->base, 
+ 						     REG_WORD_OFFSET + 5);
+ 			}
+@@ -229,7 +229,7 @@
+ 	/* then deal with cases where there is an effective address */
+ 	ea = &op->data.expression;
+ 	op->type = op_expression;
+-	op->flags |= op_pointer;
++	op->flags = or_x86_op_flags(op->flags, op_pointer);
+ 
+ 	if ( insn->addr_size == 2 ) {
+ 		/* gah! 16 bit mode! */
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_operand.c
+--- a/src/third_party/libdisasm/ia32_operand.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_operand.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -19,17 +19,17 @@
+ 	/* apply overrides from prefix */
+ 	switch ( prefixes & PREFIX_REG_MASK ) {
+ 		case PREFIX_CS:
+-			op->flags |= op_cs_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_cs_seg); break;
+ 		case PREFIX_SS:
+-			op->flags |= op_ss_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_ss_seg); break;
+ 		case PREFIX_DS:
+-			op->flags |= op_ds_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_ds_seg); break;
+ 		case PREFIX_ES:
+-			op->flags |= op_es_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_es_seg); break;
+ 		case PREFIX_FS:
+-			op->flags |= op_fs_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_fs_seg); break;
+ 		case PREFIX_GS:
+-			op->flags |= op_gs_seg; break;
++			op->flags = or_x86_op_flags(op->flags, op_gs_seg); break;
+ 	}
+ 
+ 	return;
+@@ -143,7 +143,7 @@
+ 			/* this fills op->data.near_offset or
+ 			   op->data.far_offset depending on the size of
+ 			   the operand */
+-			op->flags |= op_signed;
++			op->flags = or_x86_op_flags(op->flags, op_signed);
+ 			if ( op_size == 1 ) {
+ 				/* one-byte near offset */
+ 				op->type = op_relative_near;
+@@ -162,7 +162,7 @@
+ 			/* note bene: 'O' ADDR_METH uses addr_size  to
+ 			   determine operand size */
+ 			op->type = op_offset;
+-			op->flags |= op_pointer;
++			op->flags = or_x86_op_flags(op->flags, op_pointer);
+ 			x86_imm_sized( buf, buf_len, &op->data.offset, 
+ 					insn->addr_size );
+ 
+@@ -172,51 +172,49 @@
+ 		/* Hard-coded: these are specified in the insn definition */
+ 		case ADDRMETH_F:	/* EFLAGS register */
+ 			op->type = op_register;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			ia32_handle_register( &op->data.reg, REG_FLAGS_INDEX );
+ 			break;
+ 		case ADDRMETH_X:	/* Memory addressed by DS:SI [string] */
+ 			op->type = op_expression;
+-			op->flags |= op_hardcode;
+-			op->flags |= op_ds_seg | op_pointer | op_string;
++			op->flags = (enum x86_op_flags)(op->flags | op_hardcode | op_ds_seg | op_pointer | op_string);
+ 			ia32_handle_register( &op->data.expression.base, 
+ 					     REG_DWORD_OFFSET + 6 );
+ 			break;
+ 		case ADDRMETH_Y:	/* Memory addressed by ES:DI [string] */
+ 			op->type = op_expression;
+-			op->flags |= op_hardcode;
+-			op->flags |= op_es_seg | op_pointer | op_string;
++			op->flags = (enum x86_op_flags)(op->flags | op_hardcode | op_es_seg | op_pointer | op_string);
+ 			ia32_handle_register( &op->data.expression.base, 
+ 					     REG_DWORD_OFFSET + 7 );
+ 			break;
+ 		case ADDRMETH_RR:	/* Gen Register hard-coded in opcode */
+ 			op->type = op_register;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			ia32_handle_register( &op->data.reg, 
+ 						op_value + gen_regs );
+ 			break;
+ 		case ADDRMETH_RS:	/* Seg Register hard-coded in opcode */
+ 			op->type = op_register;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			ia32_handle_register( &op->data.reg, 
+ 						op_value + REG_SEG_OFFSET );
+ 			break;
+ 		case ADDRMETH_RF:	/* FPU Register hard-coded in opcode */
+ 			op->type = op_register;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			ia32_handle_register( &op->data.reg, 
+ 						op_value + REG_FPU_OFFSET );
+ 			break;
+ 		case ADDRMETH_RT:	/* TST Register hard-coded in opcode */
+ 			op->type = op_register;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			ia32_handle_register( &op->data.reg, 
+ 						op_value + REG_TEST_OFFSET );
+ 			break;
+ 		case ADDRMETH_II:	/* Immediate hard-coded in opcode */
+ 			op->type = op_immediate;
+ 			op->data.dword = op_value;
+-			op->flags |= op_hardcode;
++			op->flags = or_x86_op_flags(op->flags, op_hardcode);
+ 			break;
+ 
+ 		case 0:	/* Operand is not used */
+diff -r b09db93ded43 src/third_party/libdisasm/ia32_reg.c
+--- a/src/third_party/libdisasm/ia32_reg.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/ia32_reg.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -71,125 +71,128 @@
+ 	unsigned int alias;
+ 	char mnemonic[8];
+ } ia32_reg_table[NUM_X86_REGS + 2] = {
+-	{ 0, 0, 0, "" },
++
++#define DECL_REG(a, b, c, d) { a, (enum x86_reg_type)(b), (c), (d) }
++
++	DECL_REG( 0, 0, 0, "" ),
+ 	/* REG_DWORD_OFFSET */
+-	{ REG_DWORD_SIZE, reg_gen | reg_ret, 0, "eax" },
+-	{ REG_DWORD_SIZE, reg_gen | reg_count, 0, "ecx" },
+-	{ REG_DWORD_SIZE, reg_gen, 0, "edx" },
+-	{ REG_DWORD_SIZE, reg_gen, 0, "ebx" },
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_ret, 0, "eax" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_count, 0, "ecx" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen, 0, "edx" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen, 0, "ebx" ),
+ 	/* REG_ESP_INDEX */
+-	{ REG_DWORD_SIZE, reg_gen | reg_sp, 0, "esp" },
+-	{ REG_DWORD_SIZE, reg_gen | reg_fp, 0, "ebp" },
+-	{ REG_DWORD_SIZE, reg_gen | reg_src, 0, "esi" },
+-	{ REG_DWORD_SIZE, reg_gen | reg_dest, 0, "edi" },
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_sp, 0, "esp" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_fp, 0, "ebp" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_src, 0, "esi" ),
++	DECL_REG( REG_DWORD_SIZE, reg_gen | reg_dest, 0, "edi" ),
+ 	/* REG_WORD_OFFSET */
+-	{ REG_WORD_SIZE, reg_gen | reg_ret, 3, "ax" },
+-	{ REG_WORD_SIZE, reg_gen | reg_count, 6, "cx" },
+-	{ REG_WORD_SIZE, reg_gen, 9, "dx" },
+-	{ REG_WORD_SIZE, reg_gen, 12, "bx" },
+-	{ REG_WORD_SIZE, reg_gen | reg_sp, 13, "sp" },
+-	{ REG_WORD_SIZE, reg_gen | reg_fp, 14, "bp" },
+-	{ REG_WORD_SIZE, reg_gen | reg_src, 15, "si" },
+-	{ REG_WORD_SIZE, reg_gen | reg_dest, 16, "di" },
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_ret, 3, "ax" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_count, 6, "cx" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen, 9, "dx" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen, 12, "bx" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_sp, 13, "sp" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_fp, 14, "bp" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_src, 15, "si" ),
++	DECL_REG( REG_WORD_SIZE, reg_gen | reg_dest, 16, "di" ),
+ 	/* REG_BYTE_OFFSET */
+-	{ REG_BYTE_SIZE, reg_gen, 1, "al" },
+-	{ REG_BYTE_SIZE, reg_gen, 4, "cl" },
+-	{ REG_BYTE_SIZE, reg_gen, 7, "dl" },
+-	{ REG_BYTE_SIZE, reg_gen, 10, "bl" },
+-	{ REG_BYTE_SIZE, reg_gen, 2, "ah" },
+-	{ REG_BYTE_SIZE, reg_gen, 5, "ch" },
+-	{ REG_BYTE_SIZE, reg_gen, 8, "dh" },
+-	{ REG_BYTE_SIZE, reg_gen, 11, "bh" },
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 1, "al" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 4, "cl" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 7, "dl" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 10, "bl" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 2, "ah" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 5, "ch" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 8, "dh" ),
++	DECL_REG( REG_BYTE_SIZE, reg_gen, 11, "bh" ),
+ 	/* REG_MMX_OFFSET */
+-	{ REG_MMX_SIZE, reg_simd, 18, "mm0" },
+-	{ REG_MMX_SIZE, reg_simd, 19, "mm1" },
+-	{ REG_MMX_SIZE, reg_simd, 20, "mm2" },
+-	{ REG_MMX_SIZE, reg_simd, 21, "mm3" },
+-	{ REG_MMX_SIZE, reg_simd, 22, "mm4" },
+-	{ REG_MMX_SIZE, reg_simd, 23, "mm5" },
+-	{ REG_MMX_SIZE, reg_simd, 24, "mm6" },
+-	{ REG_MMX_SIZE, reg_simd, 25, "mm7" },
++	DECL_REG( REG_MMX_SIZE, reg_simd, 18, "mm0" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 19, "mm1" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 20, "mm2" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 21, "mm3" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 22, "mm4" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 23, "mm5" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 24, "mm6" ),
++	DECL_REG( REG_MMX_SIZE, reg_simd, 25, "mm7" ),
+ 	/* REG_SIMD_OFFSET */
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm0" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm1" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm2" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm3" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm4" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm5" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm6" },
+-	{ REG_SIMD_SIZE, reg_simd, 0, "xmm7" },
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm0" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm1" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm2" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm3" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm4" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm5" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm6" ),
++	DECL_REG( REG_SIMD_SIZE, reg_simd, 0, "xmm7" ),
+ 	/* REG_DEBUG_OFFSET */
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr0" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr1" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr2" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr3" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr4" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr5" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr6" },
+-	{ REG_DEBUG_SIZE, reg_sys, 0, "dr7" },
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr0" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr1" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr2" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr3" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr4" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr5" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr6" ),
++	DECL_REG( REG_DEBUG_SIZE, reg_sys, 0, "dr7" ),
+ 	/* REG_CTRL_OFFSET */
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr0" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr1" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr2" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr3" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr4" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr5" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr6" },
+-	{ REG_CTRL_SIZE, reg_sys, 0, "cr7" },
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr0" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr1" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr2" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr3" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr4" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr5" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr6" ),
++	DECL_REG( REG_CTRL_SIZE, reg_sys, 0, "cr7" ),
+ 	/* REG_TEST_OFFSET */
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr0" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr1" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr2" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr3" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr4" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr5" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr6" },
+-	{ REG_TEST_SIZE, reg_sys, 0, "tr7" },
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr0" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr1" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr2" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr3" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr4" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr5" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr6" ),
++	DECL_REG( REG_TEST_SIZE, reg_sys, 0, "tr7" ),
+ 	/* REG_SEG_OFFSET */
+-	{ REG_SEG_SIZE, reg_seg, 0, "es" },
+-	{ REG_SEG_SIZE, reg_seg, 0, "cs" },
+-	{ REG_SEG_SIZE, reg_seg, 0, "ss" },
+-	{ REG_SEG_SIZE, reg_seg, 0, "ds" },
+-	{ REG_SEG_SIZE, reg_seg, 0, "fs" },
+-	{ REG_SEG_SIZE, reg_seg, 0, "gs" },
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "es" ),
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "cs" ),
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "ss" ),
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "ds" ),
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "fs" ),
++	DECL_REG( REG_SEG_SIZE, reg_seg, 0, "gs" ),
+ 	/* REG_LDTR_INDEX */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "ldtr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "ldtr" ),
+ 	/* REG_GDTR_INDEX */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "gdtr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "gdtr" ),
+ 	/* REG_FPU_OFFSET */
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(0)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(1)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(2)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(3)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(4)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(5)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(6)" },
+-	{ REG_FPU_SIZE, reg_fpu, 0, "st(7)" },
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(0)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(1)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(2)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(3)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(4)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(5)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(6)" ),
++	DECL_REG( REG_FPU_SIZE, reg_fpu, 0, "st(7)" ),
+ 	/* REG_FLAGS_INDEX : 81 */
+-	{ REG_FLAGS_SIZE, reg_cond, 0, "eflags" }, 
++	DECL_REG( REG_FLAGS_SIZE, reg_cond, 0, "eflags" ), 
+ 	/* REG_FPCTRL_INDEX  : 82*/
+-	{ REG_FPCTRL_SIZE, reg_fpu | reg_sys, 0, "fpctrl" }, 
++	DECL_REG( REG_FPCTRL_SIZE, reg_fpu | reg_sys, 0, "fpctrl" ), 
+ 	/* REG_FPSTATUS_INDEX : 83*/
+-	{ REG_FPSTATUS_SIZE, reg_fpu | reg_sys, 0, "fpstat" },
++	DECL_REG( REG_FPSTATUS_SIZE, reg_fpu | reg_sys, 0, "fpstat" ),
+ 	/* REG_FPTAG_INDEX : 84 */
+-	{ REG_FPTAG_SIZE, reg_fpu | reg_sys, 0, "fptag" }, 
++	DECL_REG( REG_FPTAG_SIZE, reg_fpu | reg_sys, 0, "fptag" ), 
+ 	/* REG_EIP_INDEX : 85 */
+-	{ REG_EIP_SIZE, reg_pc, 0, "eip" },
++	DECL_REG( REG_EIP_SIZE, reg_pc, 0, "eip" ),
+ 	/* REG_IP_INDEX : 86 */
+-	{ REG_IP_SIZE, reg_pc, 17, "ip" },
++	DECL_REG( REG_IP_SIZE, reg_pc, 17, "ip" ),
+ 	/* REG_IDTR_INDEX : 87 */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "idtr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "idtr" ),
+ 	/* REG_MXCSG_INDEX : SSE Control Reg : 88 */
+-	{ REG_DWORD_SIZE, reg_sys | reg_simd, 0, "mxcsr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys | reg_simd, 0, "mxcsr" ),
+ 	/* REG_TR_INDEX : Task Register : 89 */
+-	{ 16 + 64, reg_sys, 0, "tr" },
++	DECL_REG( 16 + 64, reg_sys, 0, "tr" ),
+ 	/* REG_CSMSR_INDEX : SYSENTER_CS_MSR : 90 */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "cs_msr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "cs_msr" ),
+ 	/* REG_ESPMSR_INDEX : SYSENTER_ESP_MSR : 91 */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "esp_msr" },
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "esp_msr" ),
+ 	/* REG_EIPMSR_INDEX : SYSENTER_EIP_MSR : 92 */
+-	{ REG_DWORD_SIZE, reg_sys, 0, "eip_msr" },
+-	{ 0 }
++	DECL_REG( REG_DWORD_SIZE, reg_sys, 0, "eip_msr" ),
++	DECL_REG( 0, 0, 0, 0 )
+  };
+ 
+ 
+diff -r b09db93ded43 src/third_party/libdisasm/libdis.h
+--- a/src/third_party/libdisasm/libdis.h	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/libdis.h	Thu Mar 28 07:51:20 2013 -0700
+@@ -28,6 +28,16 @@
+  * __________________________________________________________________________*/
+ 
+ 
++#define or_type(t,a,b) ((t)(a|b))
++
++#define or_x86_options(a,b) or_type(enum x86_options, (a), (b))
++#define or_x86_op_access(a,b) or_type(enum x86_op_access, (a), (b))
++#define or_x86_op_flags(a,b) or_type(enum x86_op_flags, (a), (b))
++#define or_x86_op_type(a,b) or_type(enum x86_op_type, (a), (b))
++#define or_x86_reg_type(a,b) or_type(enum x86_reg_type, (a), (b))
++#define or_x86_insn_prefix(a,b) or_type(enum x86_insn_prefix, (a), (b))
++#define or_x86_insn_isa(a,b) or_type(enum x86_insn_isa, (a), (b))
++
+ /* ========================================= Error Reporting */
+ /* REPORT CODES
+  *      These are passed to a reporter function passed at initialization.
+diff -r b09db93ded43 src/third_party/libdisasm/x86_disasm.c
+--- a/src/third_party/libdisasm/x86_disasm.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/x86_disasm.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -35,7 +35,7 @@
+ 
+         if ( offset >= buf_len ) {
+                 /* another caller screwup ;) */
+-                x86_report_error(report_disasm_bounds, (void*)(long)buf_rva+offset);
++                x86_report_error(report_disasm_bounds, (void*)(uintptr_t)(buf_rva+offset));
+                 return 0;
+         }
+ 
+@@ -53,13 +53,13 @@
+ 
+         /* check and see if we had an invalid instruction */
+         if (! size ) {
+-                x86_report_error(report_invalid_insn, (void*)(long)buf_rva+offset );
++                x86_report_error(report_invalid_insn, (void*)(uintptr_t)(buf_rva+offset));
+                 return 0;
+         }
+ 
+         /* check if we overran the end of the buffer */
+         if ( size > len ) {
+-                x86_report_error( report_insn_bounds, (void*)(long)buf_rva + offset );
++                x86_report_error( report_insn_bounds, (void*)(uintptr_t)(buf_rva + offset));
+ 		MAKE_INVALID( insn, bytes );
+ 		return 0;
+ 	}
+diff -r b09db93ded43 src/third_party/libdisasm/x86_format.c
+--- a/src/third_party/libdisasm/x86_format.c	Thu Mar 28 13:23:24 2013 -0700
++++ b/src/third_party/libdisasm/x86_format.c	Thu Mar 28 07:51:20 2013 -0700
+@@ -1388,7 +1388,7 @@
+         } else { /* default to native */
+                 /* NATIVE style: RVA\tBYTES\tMNEMONIC\tOPERANDS */
+                 /* print address */
+-                STRNCATF( buf, "%08" PRIX32 "\t", insn->addr, len );
++                STRNCATF( buf, "%08"PRIX32"\t", insn->addr, len );
+ 
+                 /* print bytes */
+                 for ( i = 0; i < insn->size; i++ ) {
