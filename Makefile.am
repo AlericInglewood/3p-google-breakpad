@@ -44,14 +44,15 @@ AM_CXXFLAGS += -I$(top_srcdir)/src/common/android/testing/include
 endif
 
 if GCC
+# blatant hack to work around gcc-4.1 limitations
 # These are good warnings to be treated as errors
-AM_CXXFLAGS += \
-	-Werror=non-virtual-dtor \
-	-Werror=vla \
-	-Werror=unused-variable \
-	-Werror=missing-braces \
-	-Werror=overloaded-virtual
-endif
+#AM_CXXFLAGS += \
+#	-Werror=non-virtual-dtor \
+#	-Werror=vla \
+#	-Werror=unused-variable \
+#	-Werror=missing-braces \
+#	-Werror=overloaded-virtual
+#endif
 
 if LINUX_HOST
 # Build as PIC on Linux, for linux_client_unittest_shlib
