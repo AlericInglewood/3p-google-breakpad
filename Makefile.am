@@ -43,7 +43,7 @@ AM_CXXFLAGS += -I$(top_srcdir)/src/common/android/include
 AM_CXXFLAGS += -I$(top_srcdir)/src/common/android/testing/include
 endif
 
-if GCC
+#if GCC
 # blatant hack to work around gcc-4.1 limitations
 # These are good warnings to be treated as errors
 #AM_CXXFLAGS += \

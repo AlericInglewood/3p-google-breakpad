@@ -14,8 +14,14 @@
  */
 
 #include <string.h>
-
 #include "common/md5.h"
+
+#include <stdint.h>
+
+typedef uint32_t u32;
+typedef uint8_t u8;
+
+using namespace google_breakpad;
 
 #ifndef WORDS_BIGENDIAN
 #define byteReverse(buf, len)   /* Nothing */
