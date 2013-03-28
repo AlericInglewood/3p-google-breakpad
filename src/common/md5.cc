@@ -16,6 +16,11 @@
 #include <string.h>
 
 #include "common/md5.h"
+#include <stdint.h>
+
+using namespace google_breakpad;
+typedef uint32_t u32;
+typedef uint8_t u8;
 
 namespace google_breakpad {
 
