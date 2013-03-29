@@ -400,9 +400,10 @@
       'win_release_Optimization%': '2', # 2 = /Os
       'win_debug_Optimization%': '0',   # 0 = /Od
       # See http://msdn.microsoft.com/en-us/library/aa652367(VS.71).aspx
-      'win_release_RuntimeLibrary%': '0', # 0 = /MT (nondebug static)
-      'win_debug_RuntimeLibrary%': '1',   # 1 = /MTd (debug static)
-
+      'win_release_RuntimeLibrary%': '2', # 2 = /MT DLL
+      'win_debug_RuntimeLibrary%': '3',   # 3 = /MT DEbug DLL
+      'win_debug_TreatWChar_tAsBuiltInType': 'false',
+      'win_release_TreatWChar_tAsBuiltInType': 'false',
       'release_extra_cflags%': '',
       'debug_extra_cflags%': '',
       'release_valgrind_build%': 0,
@@ -639,6 +640,7 @@
             'PreprocessorDefinitions': ['_DEBUG'],
             'BasicRuntimeChecks': '3',
             'RuntimeLibrary': '<(win_debug_RuntimeLibrary)',
+            'TreatWChar_tAsBuiltInType': '<(win_debug_TreatWChar_tAsBuiltInType)',
           },
           'VCLinkerTool': {
             'LinkIncremental': '<(msvs_debug_link_incremental)',
@@ -669,6 +671,7 @@
           'VCCLCompilerTool': {
             'Optimization': '<(win_release_Optimization)',
             'RuntimeLibrary': '<(win_release_RuntimeLibrary)',
+            'TreatWChar_tAsBuiltInType': '<(win_release_TreatWChar_tAsBuiltInType)',
           },
           'VCLinkerTool': {
             'LinkIncremental': '1',

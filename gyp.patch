@@ -1,7 +1,7 @@
-diff -r 180ed0c2a6ab src/client/windows/build/common.gypi
---- a/src/client/windows/build/common.gypi	Wed Mar 27 04:16:25 2013 -0700
-+++ b/src/client/windows/build/common.gypi	Wed Mar 27 05:28:49 2013 -0700
-@@ -400,9 +400,8 @@
+diff -r a46210f91790 src/client/windows/build/common.gypi
+--- a/src/client/windows/build/common.gypi	Wed Mar 20 18:33:30 2013 -0700
++++ b/src/client/windows/build/common.gypi	Wed Mar 27 15:24:42 2013 -0700
+@@ -400,9 +400,10 @@
        'win_release_Optimization%': '2', # 2 = /Os
        'win_debug_Optimization%': '0',   # 0 = /Od
        # See http://msdn.microsoft.com/en-us/library/aa652367(VS.71).aspx
@@ -10,6 +10,24 @@ diff -r 180ed0c2a6ab src/client/windows/build/common.gypi
 -
 +      'win_release_RuntimeLibrary%': '2', # 2 = /MT DLL
 +      'win_debug_RuntimeLibrary%': '3',   # 3 = /MT DEbug DLL
++      'win_debug_TreatWChar_tAsBuiltInType': 'false',
++      'win_release_TreatWChar_tAsBuiltInType': 'false',
        'release_extra_cflags%': '',
        'debug_extra_cflags%': '',
        'release_valgrind_build%': 0,
+@@ -639,6 +640,7 @@
+             'PreprocessorDefinitions': ['_DEBUG'],
+             'BasicRuntimeChecks': '3',
+             'RuntimeLibrary': '<(win_debug_RuntimeLibrary)',
++            'TreatWChar_tAsBuiltInType': '<(win_debug_TreatWChar_tAsBuiltInType)',
+           },
+           'VCLinkerTool': {
+             'LinkIncremental': '<(msvs_debug_link_incremental)',
+@@ -669,6 +671,7 @@
+           'VCCLCompilerTool': {
+             'Optimization': '<(win_release_Optimization)',
+             'RuntimeLibrary': '<(win_release_RuntimeLibrary)',
++            'TreatWChar_tAsBuiltInType': '<(win_release_TreatWChar_tAsBuiltInType)',
+           },
+           'VCLinkerTool': {
+             'LinkIncremental': '1',

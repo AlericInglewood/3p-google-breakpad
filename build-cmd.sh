@@ -35,7 +35,9 @@ case "$AUTOBUILD_PLATFORM" in
     "windows")
         # patch vcproj generator to use Multi-Threaded DLL for +3 link karma
         #
-        patch -p 1 < gyp.patch
+	# modified gyp is checked in now...patch is in repo for reference
+	#
+        #patch -p 1 < gyp.patch
         (
             cd src/client/windows
             ../../tools/gyp/gyp --no-circular-check -f msvs -G msvs-version=2005
