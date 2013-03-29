@@ -119,18 +119,33 @@ case "$AUTOBUILD_PLATFORM" in
         mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
         mkdir -p "$INCLUDE_DIRECTORY/client/linux/handler"
         mkdir -p "$INCLUDE_DIRECTORY/client/linux/crash_generation"
+        mkdir -p "$INCLUDE_DIRECTORY/client/linux/minidump_writer"
+        mkdir -p "$INCLUDE_DIRECTORY/client/linux/log"
+        mkdir -p "$INCLUDE_DIRECTORY/third_party/lss"
 
-        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
-		cp src/common/using_std_string.h "$INCLUDE_DIRECTORY"
-
+	# replicate breakpad headers
         cp src/common/*.h "$INCLUDE_DIRECTORY/common"
+        cp src/google_breakpad/common/*.h "$INCLUDE_DIRECTORY/google_breakpad/common"
 
+	# no really all of them
         cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation/"
         cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY/client/linux/handler/"
+        cp src/client/linux/minidump_writer/*.h "$INCLUDE_DIRECTORY/client/linux/minidump_writer/"
+        cp src/client/linux/log/*.h "$INCLUDE_DIRECTORY/client/linux/log/"
+        cp src/third_party/lss/* "$INCLUDE_DIRECTORY/third_party/lss/"
+
+	# and then cherry-pick some so they are found as used by linden
+        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
+	cp src/common/using_std_string.h "$INCLUDE_DIRECTORY"
+        cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY"
+        cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY/google_breakpad/"
+        cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY"
+        cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY/google_breakpad/"
 
         cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
         cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
 
+	# libs and binaries
         cp -P stage/lib/libbreakpad*.a* "$LIBRARY_DIRECTORY_RELEASE"
         cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
     ;;

@@ -64,10 +64,14 @@
             <string>lib/release/*</string>
             <string>include/google_breakpad/common/*</string>
             <string>include/google_breakpad/google_breakpad/common/*</string>
+            <string>include/google_breakpad/google_breakpad/*.h</string>
             <string>include/google_breakpad/processor/*.h</string>
             <string>include/google_breakpad/*.h</string>
             <string>include/google_breakpad/client/linux/crash_generation/*</string>
             <string>include/google_breakpad/client/linux/handler/*</string>
+            <string>include/google_breakpad/client/linux/minidump_writer/*</string>
+            <string>include/google_breakpad/client/linux/log/*</string>
+            <string>include/google_breakpad/third_party/lss/*</string>
             <string>bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
