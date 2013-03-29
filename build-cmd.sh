@@ -104,7 +104,7 @@ case "$AUTOBUILD_PLATFORM" in
         fi
 
         if [ -f /usr/bin/g++-4.1 ] ; then
-            export CXX=gcc
+            export CXX=g++-4.1
         else
             export CXX=g++
         fi
