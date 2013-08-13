@@ -52,6 +52,8 @@ case "$AUTOBUILD_PLATFORM" in
         devenv.com src/client/windows/breakpad_client.sln /build "debug" /project exception_handler
         devenv.com src/client/windows/breakpad_client.sln /build "release" /project crash_generation_client
         devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project crash_generation_client
+        devenv.com src/client/windows/breakpad_client.sln /build "release" /project crash_generation_server
+        devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project crash_generation_server
         devenv.com src/client/windows/breakpad_client.sln /build "release"  /project common
         devenv.com src/client/windows/breakpad_client.sln /build "debug"  /project common
 
