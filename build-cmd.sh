@@ -1,6 +1,8 @@
 #!/bin/sh
 
-cd "$(dirname "$0")"
+cd "`dirname "$0"`"
+top="`pwd`"
+stage="$top/stage"
 
 # turn on verbose debugging output for parabuild logs.
 set -x
@@ -11,25 +13,56 @@ if [ -z "$AUTOBUILD" ] ; then
     fail
 fi
 
-# load autobuild provided shell functions and variables
-# first remap the autobuild env to fix the path for sickwin
 if [ "$OSTYPE" = "cygwin" ] ; then
-    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+    export AUTOBUILD="`cygpath -u $AUTOBUILD`"
 fi
 
+# load autbuild provided shell functions and variables
 set +x
-eval "$("$AUTOBUILD" source_environment)"
+eval "`"$AUTOBUILD" source_environment`"
 set -x
 
-LIBRARY_DIRECTORY_DEBUG=./stage/lib/debug
-LIBRARY_DIRECTORY_RELEASE=./stage/lib/release
-BINARY_DIRECTORY=./stage/bin
-INCLUDE_DIRECTORY=./stage/include/google_breakpad
-mkdir -p "$LIBRARY_DIRECTORY_DEBUG"
-mkdir -p "$LIBRARY_DIRECTORY_RELEASE"
-mkdir -p "$BINARY_DIRECTORY"
-mkdir -p "$INCLUDE_DIRECTORY"
-mkdir -p "$INCLUDE_DIRECTORY/common"
+build_linux()
+{
+    prefix="$1"
+    bits="$2"
+    shift; shift
+
+    VIEWER_FLAGS="-m$bits -fno-stack-protector"
+    ./configure --prefix="$top/stage$prefix" --libdir="$top/stage$prefix/lib/release" --disable-processor CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAG="-m$bits"
+
+    make
+    make -C src/tools/linux/dump_syms/ dump_syms CXXFLAGS="-g3 -O2 -Wall -m$bits"
+    make install
+
+    INCLUDE_DIRECTORY="$stage$prefix/include/google_breakpad"
+    mkdir -p "$INCLUDE_DIRECTORY"
+    mkdir -p "$INCLUDE_DIRECTORY/client/linux/handler"
+    mkdir -p "$INCLUDE_DIRECTORY/client/linux/crash_generation"
+    mkdir -p "$INCLUDE_DIRECTORY/client/linux/minidump_writer"
+    mkdir -p "$INCLUDE_DIRECTORY/client/linux/log"
+    mkdir -p "$INCLUDE_DIRECTORY/common"
+    mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
+    mkdir -p "$INCLUDE_DIRECTORY/processor"
+    mkdir -p "$INCLUDE_DIRECTORY/third_party/lss"
+
+    # Replicate breakpad headers
+    cp src/common/*.h "$INCLUDE_DIRECTORY/common"
+    cp src/google_breakpad/common/*.h "$INCLUDE_DIRECTORY/google_breakpad/common"
+    cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation"
+    cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY/client/linux/handler"
+    cp src/client/linux/minidump_writer/*.h "$INCLUDE_DIRECTORY/client/linux/minidump_writer"
+    cp src/client/linux/log/*.h "$INCLUDE_DIRECTORY/client/linux/log"
+    cp src/third_party/lss/*.h "$INCLUDE_DIRECTORY/third_party/lss"
+
+    # And then cherry-pick some so they are found as used by the viewer
+    cp src/common/using_std_string.h "$INCLUDE_DIRECTORY"
+    cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY"
+    cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY/google_breakpad/"
+    cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY"
+    cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY/google_breakpad/"
+    cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
+}
 
 case "$AUTOBUILD_PLATFORM" in
     "windows")
@@ -96,66 +129,18 @@ case "$AUTOBUILD_PLATFORM" in
         cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
         cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
     ;;
-    linux)
-        VIEWER_FLAGS="-m32 -fno-stack-protector"
-
-        if [ -f /usr/bin/gcc-4.1 ] ; then
-            export CC=gcc-4.1
-        else
-            export CC=gcc
-        fi
-
-        if [ -f /usr/bin/g++-4.1 ] ; then
-            export CXX=g++-4.1
-        else
-            export CXX=g++
-        fi
-
-        ./configure --prefix="$(pwd)/stage" CFLAGS="$VIEWER_FLAGS" CXXFLAGS="$VIEWER_FLAGS" LDFLAGS=-m32
-        make
-        make -C src/tools/linux/dump_syms/ dump_syms
-        make install
-
-        mkdir -p "$INCLUDE_DIRECTORY/processor"
-        mkdir -p "$INCLUDE_DIRECTORY/common"
-        mkdir -p "$INCLUDE_DIRECTORY/google_breakpad/common"
-        mkdir -p "$INCLUDE_DIRECTORY/client/linux/handler"
-        mkdir -p "$INCLUDE_DIRECTORY/client/linux/crash_generation"
-        mkdir -p "$INCLUDE_DIRECTORY/client/linux/minidump_writer"
-        mkdir -p "$INCLUDE_DIRECTORY/client/linux/log"
-        mkdir -p "$INCLUDE_DIRECTORY/third_party/lss"
-
-	# replicate breakpad headers
-        cp src/common/*.h "$INCLUDE_DIRECTORY/common"
-        cp src/google_breakpad/common/*.h "$INCLUDE_DIRECTORY/google_breakpad/common"
-
-	# no really all of them
-        cp src/client/linux/crash_generation/*.h "$INCLUDE_DIRECTORY/client/linux/crash_generation/"
-        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY/client/linux/handler/"
-        cp src/client/linux/minidump_writer/*.h "$INCLUDE_DIRECTORY/client/linux/minidump_writer/"
-        cp src/client/linux/log/*.h "$INCLUDE_DIRECTORY/client/linux/log/"
-        cp src/third_party/lss/* "$INCLUDE_DIRECTORY/third_party/lss/"
-
-	# and then cherry-pick some so they are found as used by linden
-        cp src/client/linux/handler/*.h "$INCLUDE_DIRECTORY"
-	cp src/common/using_std_string.h "$INCLUDE_DIRECTORY"
-        cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY"
-        cp src/client/linux/handler/exception_handler.h "$INCLUDE_DIRECTORY/google_breakpad/"
-        cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY"
-        cp src/client/linux/handler/minidump_descriptor.h "$INCLUDE_DIRECTORY/google_breakpad/"
-
-        cp src/processor/scoped_ptr.h "$INCLUDE_DIRECTORY/processor/scoped_ptr.h"
-        cp src/common/scoped_ptr.h "$INCLUDE_DIRECTORY/common/scoped_ptr.h"
-
-	# libs and binaries
-        cp -P stage/lib/libbreakpad*.a* "$LIBRARY_DIRECTORY_RELEASE"
-        cp src/tools/linux/dump_syms/dump_syms "$BINARY_DIRECTORY"
+    "linux")
+	build_linux /libraries/i686-linux 32
+    ;;
+    "linux64")
+	build_linux /libraries/x86_64-linux 64
     ;;
 esac
-mkdir -p "$INCLUDE_DIRECTORY/common"
-# yes, this looks dumb, no, it's not incorrect
-mkdir -p stage/LICENSES
-cp COPYING stage/LICENSES/google_breakpad.txt
+
+mkdir -p "$stage/LICENSES"
+cp COPYING "$stage/LICENSES/google_breakpad.txt"
+
+cd "$top"
 
 pass
 

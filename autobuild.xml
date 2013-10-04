@@ -61,22 +61,60 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/release/*</string>
-            <string>include/google_breakpad/common/*</string>
-            <string>include/google_breakpad/google_breakpad/common/*</string>
-            <string>include/google_breakpad/google_breakpad/*.h</string>
-            <string>include/google_breakpad/processor/*.h</string>
-            <string>include/google_breakpad/*.h</string>
-            <string>include/google_breakpad/client/linux/crash_generation/*</string>
-            <string>include/google_breakpad/client/linux/handler/*</string>
-            <string>include/google_breakpad/client/linux/minidump_writer/*</string>
-            <string>include/google_breakpad/client/linux/log/*</string>
-            <string>include/google_breakpad/third_party/lss/*</string>
-            <string>bin/dump_syms</string>
+	    <string>libraries/i686-linux/lib/release/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/common/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/google_breakpad/common/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/google_breakpad/*.h</string>
+	    <string>libraries/i686-linux/include/google_breakpad/processor/*.h</string>
+	    <string>libraries/i686-linux/include/google_breakpad/*.h</string>
+	    <string>libraries/i686-linux/include/google_breakpad/client/linux/crash_generation/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/client/linux/handler/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/client/linux/minidump_writer/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/client/linux/log/*</string>
+	    <string>libraries/i686-linux/include/google_breakpad/third_party/lss/*</string>
+	    <string>libraries/i686-linux/bin/dump_syms</string>
             <string>LICENSES/google_breakpad.txt</string>
           </array>
           <key>name</key>
           <string>linux</string>
+        </map>
+        <key>linux64</key>
+        <map>
+          <key>build_directory</key>
+          <string>stage</string>
+          <key>configurations</key>
+          <map>
+            <key>RelWithDebInfo</key>
+            <map>
+              <key>build</key>
+              <map>
+                <key>command</key>
+                <string>../build-cmd.sh</string>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>RelWithDebInfo</string>
+            </map>
+          </map>
+          <key>manifest</key>
+          <array>
+	    <string>libraries/x86_64-linux/lib/release/libbreakpad*.a</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/common/*</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/google_breakpad/common/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/google_breakpad/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/processor/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/client/linux/crash_generation/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/client/linux/handler/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/client/linux/minidump_writer/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/client/linux/log/*.h</string>
+	    <string>libraries/x86_64-linux/include/google_breakpad/third_party/lss/*.h</string>
+	    <string>libraries/x86_64-linux/bin/dump_syms</string>
+            <string>LICENSES/google_breakpad.txt</string>
+          </array>
+          <key>name</key>
+          <string>linux64</string>
         </map>
         <key>windows</key>
         <map>
